@@ -8,22 +8,31 @@
 </template>
 
 <script>
+import { mapMutations, mapState } from 'vuex'
+import * as types from '../store/mutation-types'
+
 export default {
   name: 'poker',
   props: ['pokerData'],
-
   methods: {
+    ...mapMutations([
+      types.SELECT_POKER,
+      types.SUM_ITEM_POINTS,
+      types.SUM_POINTS
+    ]),
     selectPoker (e) {
       e.preventDefault()
-      this.$store.commit('selectPoker', this.pokerData.id)
-      this.$store.commit('sumItemPoints', this.pokerData.id)
-      this.$store.commit('sumPoints')
+      this.SELECT_POKER(this.pokerData.id)
+      this.SUM_ITEM_POINTS(this.pokerData.id)
+      this.SUM_POINTS()
     }
   },
-
   computed: {
+    ...mapState({
+      'currentPoker': state => state.poker.currentPoker
+    }),
     highlight () {
-      return this.pokerData.id === this.$store.state.currentPoker
+      return this.pokerData.id === this.currentPoker
     }
   }
 }

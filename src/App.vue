@@ -15,20 +15,22 @@
       <chip :chipData="{ id: 6, point: 1000000, name: '1000000'}"></chip>
     </div>
 
-    <div>当前选择的卡片: {{ this.$store.state.currentPoker }}</div>
-    <div>当前押注: {{ this.$store.state.currentChip }}</div>
-    <div>貂蝉:{{ this.$store.state.currentSumPoints1 }}</div>
-    <div>西施:{{ this.$store.state.currentSumPoints2 }}</div>
-    <div>杨贵妃:{{ this.$store.state.currentSumPoints3 }}</div>
-    <div>如花:{{ this.$store.state.currentSumPoints4 }}</div>
-    <div>押注的总点数: {{ this.$store.state.currentSumPoints }}</div>
+    <div>当前选择的卡片: {{ this.currentPoker }}</div>
+    <div>当前押注: {{ this.currentChip }}</div>
+    <div>貂蝉:{{ this.currentSumPoints1 }}</div>
+    <div>西施:{{ this.currentSumPoints2 }}</div>
+    <div>杨贵妃:{{ this.currentSumPoints3 }}</div>
+    <div>如花:{{ this.currentSumPoints4 }}</div>
+    <div>押注的总点数: {{ this.currentSumPoints }}</div>
     <div>操作: <button @click="resetSumPoints">reset</button><button>start</button></div>
   </div>
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex'
 import Poker from './components/Poker'
 import Chip from './components/Chip'
+import * as types from './store/mutation-types'
 
 export default {
   name: 'app',
@@ -36,9 +38,23 @@ export default {
     Poker,
     Chip
   },
+  computed: {
+    ...mapState({
+      currentPoker: state => state.poker.currentPoker,
+      currentChip: state => state.poker.currentChip,
+      currentSumPoints1: state => state.poker.currentSumPoints1,
+      currentSumPoints2: state => state.poker.currentSumPoints2,
+      currentSumPoints3: state => state.poker.currentSumPoints3,
+      currentSumPoints4: state => state.poker.currentSumPoints4,
+      currentSumPoints: state => state.poker.currentSumPoints
+    })
+  },
   methods: {
+    ...mapMutations([
+      types.RESET_POINTS
+    ]),
     resetSumPoints () {
-      this.$store.commit('resetPoints')
+      this.RESET_POINTS()
     }
   }
 }

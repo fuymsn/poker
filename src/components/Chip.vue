@@ -8,19 +8,28 @@
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex'
+import * as types from '../store/mutation-types'
+
 export default {
   name: 'chip',
   props: ['chipData'],
 
   methods: {
+    ...mapMutations([
+      types.SELECT_CHIP
+    ]),
     bet () {
-      this.$store.commit('selectChip', { id: this.chipData.id, point: this.chipData.point })
+      this.SELECT_CHIP({ id: this.chipData.id, point: this.chipData.point })
     }
   },
 
   computed: {
+    ...mapState({
+      currentChip: state => state.poker.currentChip
+    }),
     highlight () {
-      return this.chipData.id === this.$store.state.currentChip
+      return this.chipData.id === this.currentChip
     }
   }
 }
