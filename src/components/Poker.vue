@@ -22,9 +22,9 @@ export default {
     ]),
     selectPoker (e) {
       e.preventDefault()
-      this.SELECT_POKER(this.pokerData.id)
-      this.SUM_ITEM_POINTS(this.pokerData.id)
-      this.SUM_POINTS()
+      this[types.SELECT_POKER](this.pokerData.id)
+      this[types.SUM_ITEM_POINTS](this.pokerData.id)
+      this[types.SUM_POINTS]()
     }
   },
   computed: {

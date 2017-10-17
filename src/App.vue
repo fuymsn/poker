@@ -54,7 +54,7 @@ export default {
       types.RESET_POINTS
     ]),
     resetSumPoints () {
-      this.RESET_POINTS()
+      this[types.RESET_POINTS]()
     }
   }
 }

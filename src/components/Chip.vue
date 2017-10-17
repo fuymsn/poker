@@ -20,7 +20,7 @@ export default {
       types.SELECT_CHIP
     ]),
     bet () {
-      this.SELECT_CHIP({ id: this.chipData.id, point: this.chipData.point })
+      this[types.SELECT_CHIP]({ id: this.chipData.id, point: this.chipData.point })
     }
   },
 
