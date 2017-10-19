@@ -2,10 +2,14 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import Vuex from 'vuex'
+import VueNativeSock from 'vue-native-websocket'
 import App from './App'
 import store from './store'
 
 Vue.use(Vuex)
+
+Vue.use(VueNativeSock, 'ws://10.72.2.39:8083/websocket?request=e3VpZDoyNjUwMDAxO3JpZDoyNjUwMDEwO3Rva2VuOiI0MzYwNjgxMWM3MzA1Y2NjNmFiYjJiZTExNjU3OWJmZCJ9', { store: store, format: 'json' })
+
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */

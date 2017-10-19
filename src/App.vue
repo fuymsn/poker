@@ -23,6 +23,10 @@
     <div>如花:{{ this.currentSumPoints4 }}</div>
     <div>押注的总点数: {{ this.currentSumPoints }}</div>
     <div>操作: <button @click="resetSumPoints">reset</button><button>start</button></div>
+    <div>websocket state</div>
+    <p v-if="isConnected">We're connected to the server!</p>
+    <p>Message from server: "{{ message }}"</p>
+    <button @click="pingServer">Ping Server</button>
   </div>
 </template>
 
@@ -40,6 +44,8 @@ export default {
   },
   computed: {
     ...mapState({
+      isConnected: state => state.websocket.isConnected,
+      message: state => state.websocket.message,
       currentPoker: state => state.poker.currentPoker,
       currentChip: state => state.poker.currentChip,
       currentSumPoints1: state => state.poker.currentSumPoints1,
@@ -55,6 +61,9 @@ export default {
     ]),
     resetSumPoints () {
       this[types.RESET_POINTS]()
+    },
+    pingServer () {
+      this.$socket.send(123)
     }
   }
 }
