@@ -22,7 +22,7 @@
     <div>杨贵妃:{{ this.currentSumPoints3 }}</div>
     <div>如花:{{ this.currentSumPoints4 }}</div>
     <div>押注的总点数: {{ this.currentSumPoints }}</div>
-    <div>操作: <button @click="resetSumPoints">reset</button><button>start</button></div>
+    <div>操作: <button @click="resetSumPoints">reset</button></div>
     <div>websocket state</div>
     <p v-if="isConnected">We're connected to the server!</p>
     <p>Message from server: "{{ message }}"</p>
@@ -63,7 +63,7 @@ export default {
       this[types.RESET_POINTS]()
     },
     pingServer () {
-      this.$socket.send(123)
+      this.$socket.send('pong')
     }
   }
 }

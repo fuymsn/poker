@@ -40,7 +40,7 @@ export default {
   border-radius: 100px;
   width: 50px;
   height: 50px;
-  border: 1px solid #ccc;
+  border: 3px solid #ccc;
   margin: 0px 5px;
   cursor: pointer;
   line-height: 50px;
@@ -50,7 +50,7 @@ export default {
 }
 
 .po-chip-hl{
-  border: 1px solid red;
+  border: 3px solid red;
 }
 </style>
 

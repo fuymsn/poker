@@ -25,6 +25,7 @@ export default {
       this[types.SELECT_POKER](this.pokerData.id)
       this[types.SUM_ITEM_POINTS](this.pokerData.id)
       this[types.SUM_POINTS]()
+      this.$socket.sendObj({ cmd: 9702002, uid: 2650001, role: 'beauty2', point: 200 })
     }
   },
   computed: {
@@ -43,7 +44,7 @@ export default {
     width: 90px;
     height: 120px;
     border-radius: 10px;
-    border: 1px solid #ccc;
+    border: 3px solid #ccc;
     cursor: pointer;
     line-height: 120px;
     text-align: center;
@@ -51,6 +52,6 @@ export default {
 }
 
 .po-poker-hl{
-  border: 1px solid red;
+  border: 3px solid red;
 }
 </style>
