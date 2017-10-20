@@ -6,17 +6,20 @@ import VueNativeSock from 'vue-native-websocket'
 import App from './App'
 import store from './store'
 
-// import Base64 from 'crypto-js/enc-base64'
+import base64 from 'base-64'
 
-// let ori = Base64.parse('')
-// let info = Base64.stringify('')
+let userInfo = {
+  gameid: 9702,
+  uid: 2650001,
+  rid: 2650010,
+  token: '43606811c7305ccc6abb2be116579bfd'
+}
 
-// console.log(ori)
-// console.log(info)
+let userInfoEncode = base64.encode(JSON.stringify(userInfo))
+console.log(userInfoEncode)
 
 Vue.use(Vuex)
-
-Vue.use(VueNativeSock, 'ws://10.72.2.39:8083/websocket?request=e3VpZDoyNjUwMDAxO3JpZDoyNjUwMDEwO3Rva2VuOiI0MzYwNjgxMWM3MzA1Y2NjNmFiYjJiZTExNjU3OWJmZCJ9', { store: store, format: 'json' })
+Vue.use(VueNativeSock, 'ws://10.72.2.39:8083/websocket?request=' + userInfoEncode, { store: store, format: 'json' })
 
 Vue.config.productionTip = false
 

@@ -10,3 +10,8 @@ export const SELECT_CHIP = 'SELECT_CHIP'
 export const RESET_POINTS = 'RESET_POINTS'
 export const SUM_ITEM_POINTS = 'SUM_ITEM_POINTS'
 export const SUM_POINTS = 'SUM_POINTS'
+
+// user
+export const USER_SET_GAMEID = 'USER_SET_GAMEID'
+export const USER_SET_UID = 'USER_SET_UID'
+export const USER_SET_RID = 'USER_SET_RID'

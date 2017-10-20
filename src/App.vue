@@ -10,9 +10,9 @@
       <chip :chipData="{ id: 1, point: 10, name: '10'}"></chip>
       <chip :chipData="{ id: 2, point: 100, name: '100'}"></chip>
       <chip :chipData="{ id: 3, point: 1000, name: '1000'}"></chip>
-      <chip :chipData="{ id: 4, point: 10000, name: '10000'}"></chip>
-      <chip :chipData="{ id: 5, point: 100000, name: '100000'}"></chip>
-      <chip :chipData="{ id: 6, point: 1000000, name: '1000000'}"></chip>
+      <chip :chipData="{ id: 4, point: 10000, name: '一万'}"></chip>
+      <chip :chipData="{ id: 5, point: 100000, name: '十万'}"></chip>
+      <chip :chipData="{ id: 6, point: 1000000, name: '百万'}"></chip>
     </div>
 
     <div>当前选择的卡片: {{ this.currentPoker }}</div>
