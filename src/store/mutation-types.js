@@ -11,6 +11,13 @@ export const RESET_POINTS = 'RESET_POINTS'
 export const SUM_ITEM_POINTS = 'SUM_ITEM_POINTS'
 export const SUM_POINTS = 'SUM_POINTS'
 
+export const SET_POKER_WIDTH = 'SET_POKER_WIDTH'
+export const SET_POKER_HEIGHT = 'SET_POKER_HEIGHT'
+export const SET_POKER_COORD = 'SET_POKER_COORD'
+
+export const SET_CHIP_WIDTH = 'SET_CHIP_WIDTH'
+export const SET_CHIP_HEIGHT = 'SET_CHIP_HEIGHT'
+export const SET_CHIP_COORD = 'SET_CHIP_COORD'
 // user
 export const USER_SET_GAMEID = 'USER_SET_GAMEID'
 export const USER_SET_UID = 'USER_SET_UID'

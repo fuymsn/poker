@@ -22,14 +22,16 @@ const mutations = {
   // receive message
   [types.WS_MESSAGE]: (state, info) => {
     // 当前用户消息
-    state.message = info.data
+    let message = typeof info.data.message === 'object' ? JSON.parse(info.data.message) : info.data.message
+    state.message = message
 
-    switch (info.cmd) {
+    switch (message.cmd) {
       // 用户登录
       case 9702001:
         break
       // 押注
       case 9702002:
+        console.log('押注:' + message)
         break
       // 单点推送押注信息
       case 9702003:
@@ -46,7 +48,6 @@ const mutations = {
       default:
 
     }
-    console.log(info)
   }
 }
 

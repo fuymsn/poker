@@ -52,6 +52,13 @@ export default {
 }
 
 .po-poker-hl{
-  border: 3px solid red;
+  animation:chipShine 3s infinite 
 }
+
+@keyframes chipShine {
+    0%   { box-shadow: 0px 0px 0px 0px yellow; }
+    50%  { box-shadow: 0px 0px 10px 2px yellow; }
+    100% { box-shadow: 0px 0px 0px 0px yellow; }
+}
+
 </style>
