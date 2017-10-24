@@ -16,7 +16,7 @@
     </div>
 
     <div>
-      <chip :chipData="{ id: 1, point: 10, name: '10'}" ref='c1'></chip>
+      <chip :chipData="{ id: 1, point: 10, name: '10'}"></chip>
     </div>
 
     <div>当前选择的卡片: {{ this.currentPoker }}</div>
@@ -98,7 +98,7 @@ export default {
           })
         }
 
-        if (el.className === 'po-chip') {
+        if (/po-chip/.test(el.className)) {
           coordChipArr.push({
             x: el.offsetLeft,
             y: el.offsetTop
