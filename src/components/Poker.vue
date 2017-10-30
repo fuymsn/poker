@@ -1,9 +1,9 @@
 <template>
   <div 
     class="po-poker"
-    :class="{ 'po-poker-hl': highlight }"
-    @click="selectPoker"
-  >{{ pokerData.name }}
+    :class="[chipIdClass, highlightClass]"
+    @click.prevent="selectPoker"
+  >{{ pokerInfo.name }}
   </div>
 </template>
 
@@ -13,27 +13,67 @@ import * as types from '../store/mutation-types'
 
 export default {
   name: 'poker',
-  props: ['pokerData'],
+  props: ['pokerInfo'],
   methods: {
     ...mapMutations([
       types.SELECT_POKER,
       types.SUM_ITEM_POINTS,
-      types.SUM_POINTS
+      types.SUM_POINTS,
+      types.UPDATE_CHIP_LIST
     ]),
+
+    // 获取chipItem信息
+    getChipItem () {
+      // 获取当前押注顶点坐标
+      const coord = this.pokerCoord[this.currentPoker - 1]
+
+      return {
+        pokerId: this.currentPoker,
+        chipId: this.currentChip,
+        x: parseInt(coord.x + Math.random() * (this.pokerWidth - this.chipWidth), 10),
+        y: parseInt(coord.y + Math.random() * (this.pokerHeight - this.chipHeight), 10)
+      }
+    },
+    // 选择扑克牌押注
     selectPoker (e) {
-      e.preventDefault()
-      this[types.SELECT_POKER](this.pokerData.id)
-      this[types.SUM_ITEM_POINTS](this.pokerData.id)
+      let that = this
+      if (this.currentChip === 0) return
+
+      this[types.SELECT_POKER](this.pokerInfo.id)
+      this[types.SUM_ITEM_POINTS](this.pokerInfo.id)
       this[types.SUM_POINTS]()
-      this.$socket.sendObj({ cmd: 9702002, uid: 2650001, role: 'beauty2', point: 200 })
+      // 向chiplist推送数据
+      this[types.UPDATE_CHIP_LIST](this.getChipItem())
+
+      setTimeout(() => {
+        const lastEle = that.chipList[that.chipList.length - 1]
+        that.$parent.$refs.chipList.lastChild.style.setProperty('transform', 'translate(' + lastEle.x + 'px,' + lastEle.y + 'px)')
+      }, 100)
+      // 向服务器发送数据
+      // this.$socket.sendObj({
+      //   cmd: 9702002,
+      //   uid: 2650001,
+      //   role: 'beauty2',
+      //   point: 200
+      // })
     }
   },
   computed: {
     ...mapState({
-      'currentPoker': state => state.poker.currentPoker
+      'currentPoker': state => state.poker.currentPoker,
+      'currentChip': state => state.poker.currentChip,
+      'pokerHeight': state => state.poker.pokerHeight,
+      'pokerWidth': state => state.poker.pokerWidth,
+      'pokerCoord': state => state.poker.pokerCoord,
+      'chipList': state => state.poker.chipList,
+      'chipHeight': state => state.poker.chipHeight,
+      'chipWidth': state => state.poker.chipWidth
     }),
-    highlight () {
-      return this.pokerData.id === this.currentPoker
+    chipIdClass () {
+      return 'po-poker' + this.pokerInfo.id
+    },
+    highlightClass () {
+      return this.pokerInfo.id === this.currentPoker ? 'po-poker-hl' : ''
     }
   }
 }
@@ -41,18 +81,32 @@ export default {
 
 <style scoped>
 .po-poker{
-    width: 90px;
+    width: 68px;
     height: 120px;
     border-radius: 10px;
-    border: 3px solid #ccc;
     cursor: pointer;
     line-height: 120px;
     text-align: center;
     user-select: none;
+    margin: 10px 2px;
+    background-size: cover;
+    text-indent: -9999px;
 }
 
+.po-poker1{
+    background-image: url(../assets/poker_diao.png)
+}
+.po-poker2{
+    background-image: url(../assets/poker_wang.png)
+}
+.po-poker3{
+    background-image: url(../assets/poker_xi.png)
+}
+.po-poker4{
+    background-image: url(../assets/poker_yang.png)
+}
 .po-poker-hl{
-  animation:chipShine 3s infinite 
+    animation:chipShine 3s infinite 
 }
 
 @keyframes chipShine {

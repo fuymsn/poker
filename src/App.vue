@@ -1,22 +1,31 @@
 <template>
   <div id="app">
     <div class="po-poker-block">
-      <poker :pokerData="{ id: 1, name: '貂蝉'}" ref='p1'></poker>
-      <poker :pokerData="{ id: 2, name: '西施'}" ref='p2'></poker>
-      <poker :pokerData="{ id: 3, name: '贵妃'}" ref='p3'></poker>
-      <poker :pokerData="{ id: 4, name: '如花'}" ref='p4'></poker>
+      <poker 
+        v-for="poker in pokerData"
+        :ref="'p' + poker.id"
+        :key="poker.id"
+        :pokerInfo="poker"
+        ></poker>
     </div>
     <div class="po-chip-block">
-      <chip :chipData="{ id: 1, point: 10, name: '10'}" ref='c1'></chip>
-      <chip :chipData="{ id: 2, point: 100, name: '100'}" ref='c2'></chip>
-      <chip :chipData="{ id: 3, point: 1000, name: '一千'}" ref='c3'></chip>
-      <chip :chipData="{ id: 4, point: 10000, name: '一万'}" ref='c4'></chip>
-      <chip :chipData="{ id: 5, point: 100000, name: '十万'}" ref='c5'></chip>
-      <chip :chipData="{ id: 6, point: 1000000, name: '百万'}" ref='c6'></chip>
+      <chip 
+        v-for="chip in chipData"
+        type='btn'
+        :ref="'c' + chip.id"
+        :key="chip.id"
+        :chipInfo="{ chipId: chip.id }"
+        ></chip>
     </div>
 
-    <div>
-      <chip :chipData="{ id: 1, point: 10, name: '10'}"></chip>
+    <div ref="chipList">
+      <chip 
+      v-for="item in chipList" 
+      :chipInfo="item"
+      :key="item.x"
+      :chipStyle="{ transform: 'translate(' + chipCoord[item.chipId-1].x + 'px, ' + chipCoord[item.chipId-1].y + 'px)' }"
+      type='move'
+      ></chip>
     </div>
 
     <div>当前选择的卡片: {{ this.currentPoker }}</div>
@@ -59,7 +68,11 @@ export default {
       currentSumPoints2: state => state.poker.currentSumPoints2,
       currentSumPoints3: state => state.poker.currentSumPoints3,
       currentSumPoints4: state => state.poker.currentSumPoints4,
-      currentSumPoints: state => state.poker.currentSumPoints
+      currentSumPoints: state => state.poker.currentSumPoints,
+      chipList: state => state.poker.chipList,
+      chipCoord: state => state.poker.chipCoord,
+      pokerData: state => state.poker.pokerData,
+      chipData: state => state.poker.chipData
     })
   },
   methods: {
@@ -83,25 +96,31 @@ export default {
       const coordChipArr = []
       const that = this
       // 设置poker宽高
-      this[types.SET_POKER_HEIGHT](this.$refs.p1.$el.offsetHeight)
-      this[types.SET_POKER_WIDTH](this.$refs.p1.$el.offsetWidth)
+      this[types.SET_POKER_HEIGHT](this.$refs.p1[0].$el.offsetHeight)
+      this[types.SET_POKER_WIDTH](this.$refs.p1[0].$el.offsetWidth)
       // 设置chip宽高
-      this[types.SET_CHIP_HEIGHT](this.$refs.c1.$el.offsetHeight)
-      this[types.SET_CHIP_WIDTH](this.$refs.c1.$el.offsetWidth)
+      this[types.SET_CHIP_HEIGHT](this.$refs.c1[0].$el.offsetHeight)
+      this[types.SET_CHIP_WIDTH](this.$refs.c1[0].$el.offsetWidth)
       // 保存poker数据点
       Object.keys(this.$refs).map((key, index) => {
-        let el = that.$refs[key].$el
-        if (el.className === 'po-poker') {
+        let el = that.$refs[key]
+        // 如果未定义
+        if (!Array.isArray(el)) return
+
+        // 获取ref el
+        let refEl = el[0].$el
+        // poker coord
+        if (/po-poker/.test(refEl.className)) {
           coordPokerArr.push({
-            x: el.offsetLeft,
-            y: el.offsetTop
+            x: refEl.offsetLeft,
+            y: refEl.offsetTop
           })
         }
-
-        if (/po-chip/.test(el.className)) {
+        // chip coord
+        if (/po-chip/.test(refEl.className)) {
           coordChipArr.push({
-            x: el.offsetLeft,
-            y: el.offsetTop
+            x: refEl.offsetLeft,
+            y: refEl.offsetTop
           })
         }
       })
@@ -119,18 +138,19 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
   overflow: hidden;
 }
 
 .po-poker-block{
   display: flex;
   justify-content: space-around;
+  margin: 0px 2px;
 }
 
 .po-chip-block{
   display: flex;
   justify-content: space-around;
-  margin-top: 50px;
+  margin-top: 20px;
 }
+
 </style>

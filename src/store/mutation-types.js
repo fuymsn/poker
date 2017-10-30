@@ -18,6 +18,9 @@ export const SET_POKER_COORD = 'SET_POKER_COORD'
 export const SET_CHIP_WIDTH = 'SET_CHIP_WIDTH'
 export const SET_CHIP_HEIGHT = 'SET_CHIP_HEIGHT'
 export const SET_CHIP_COORD = 'SET_CHIP_COORD'
+// chip list
+export const UPDATE_CHIP_LIST = 'UPDATE_CHIP_LIST'
+
 // user
 export const USER_SET_GAMEID = 'USER_SET_GAMEID'
 export const USER_SET_UID = 'USER_SET_UID'

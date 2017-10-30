@@ -2,37 +2,62 @@
 <div 
   class="po-chip" 
   :class="[chipIdClass, highlightClass]"
-  @click="bet"
-  >{{ chipData.name }}
+  @click.stop="bet"
+  :style="chipStyle"
+  >{{ chipName }}
 </div>
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex'
+import { mapState, mapGetters, mapMutations } from 'vuex'
 import * as types from '../store/mutation-types'
 
 export default {
   name: 'chip',
-  props: ['chipData'],
-
+  // props: ['chipData', 'type', 'chipStyle'],
+  props: ['chipInfo', 'type', 'chipStyle'],
   methods: {
     ...mapMutations([
       types.SELECT_CHIP
     ]),
-    bet () {
-      this[types.SELECT_CHIP]({ id: this.chipData.id, point: this.chipData.point })
+    bet (e) {
+      if (this.type === 'move') return
+      let id = this.chipInfo.chipId
+      let chipItemData = this.getChipItemById(id)
+      this[types.SELECT_CHIP]({
+        id: chipItemData.id,
+        point: chipItemData.point
+      })
     }
   },
-
   computed: {
     ...mapState({
       currentChip: state => state.poker.currentChip
     }),
+    ...mapGetters({
+      getChipItemById: 'getChipItemById'
+    }),
+    chipName () {
+      let id = this.chipInfo.chipId
+      let info = this.getChipItemById(id)
+      return info.name
+    },
     chipIdClass () {
-      return 'po-chip' + this.chipData.id
+      let typeClass = ''
+      if (this.type === 'move') {
+        typeClass = 'po-chip-move'
+      }
+      return 'po-chip' + this.chipInfo.chipId + ' ' + typeClass
     },
     highlightClass () {
-      return this.chipData.id === this.currentChip ? 'po-chip-hl' : ''
+      switch (this.type) {
+        case 'btn':
+          return this.chipInfo.chipId === this.currentChip ? 'po-chip-hl' : ''
+        case 'move':
+          return 'po-chip-move'
+        default:
+          return ''
+      }
     }
   }
 }
@@ -52,7 +77,10 @@ export default {
   background-image: url(../assets/chip.png);
   background-size: cover;
   color: #fff;
-  border: 1px solid #eee;
+  border: 1px solid #333;
+  transition: all 0.5s ease-out;
+  transform: translate(0px, 0px);
+  box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.5);
 }
 
 .po-chip1{
@@ -80,7 +108,16 @@ export default {
 }
 
 .po-chip-hl{
-  animation:chipShine 3s infinite 
+  animation: chipShine 3s infinite;
+}
+
+.po-chip-move{
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  cursor: default;
+  margin: 0px;
+  pointer-events: none;
 }
 
 @keyframes chipShine {
