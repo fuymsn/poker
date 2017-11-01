@@ -4,17 +4,25 @@ const state = {
   currentPoker: 0,
   currentChip: 0,
   currentPoint: 0,
+
+  // 用户自身投注数据
   currentSumPoints1: 0,
   currentSumPoints2: 0,
   currentSumPoints3: 0,
   currentSumPoints4: 0,
   currentSumPoints: 0,
 
+  // 来自服务端总的数据
+  sumPoints1: 0,
+  sumPoints2: 0,
+  sumPoints3: 0,
+  sumPoints4: 0,
+
   pokerData: [
     { id: 1, name: '貂蝉' },
-    { id: 2, name: '西施' },
-    { id: 3, name: '贵妃' },
-    { id: 4, name: '如花' }
+    { id: 2, name: '王昭君' },
+    { id: 3, name: '西施' },
+    { id: 4, name: '杨贵妃' }
   ],
   pokerHeight: 0,
   pokerWidth: 0,
@@ -37,6 +45,12 @@ const state = {
 const getters = {
   getChipItemById: (state, getters) => (id) => {
     return state.chipData.find(item => item.id === id)
+  },
+  getCurrentSumPointsItemById: (state, getters) => (id) => {
+    return state['currentSumPoints' + id]
+  },
+  getSumPointsItemById: (state, getters) => (id) => {
+    return state['sumPoints' + id]
   }
 }
 
@@ -53,9 +67,21 @@ const mutations = {
     state.currentChip = 0
     state.currentPoint = 0
     state.currentSumPoints = 0
+    state.currentSumPoints1 = 0
+    state.currentSumPoints2 = 0
+    state.currentSumPoints3 = 0
+    state.currentSumPoints4 = 0
+    state.chipList = []
+    state.sumPoints1 = 0
+    state.sumPoints2 = 0
+    state.sumPoints3 = 0
+    state.sumPoints4 = 0
   },
   [types.SUM_ITEM_POINTS]: (state, id) => {
     state['currentSumPoints' + id] = (state['currentSumPoints' + id] || 0) + state.currentPoint
+  },
+  [types.SET_SUM_ITEM_POINTS]: (state, {id, point}) => {
+    state['sumPoints' + id] = point
   },
 
   [types.SUM_POINTS]: (state) => {

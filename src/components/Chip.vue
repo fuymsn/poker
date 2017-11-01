@@ -14,7 +14,6 @@ import * as types from '../store/mutation-types'
 
 export default {
   name: 'chip',
-  // props: ['chipData', 'type', 'chipStyle'],
   props: ['chipInfo', 'type', 'chipStyle'],
   methods: {
     ...mapMutations([
@@ -66,11 +65,11 @@ export default {
 <style scoped>
 .po-chip{
   border-radius: 100px;
-  width: 30px;
-  height: 30px;
+  width: 24px;
+  height: 24px;
   margin: 0px 5px;
   cursor: pointer;
-  line-height: 30px;
+  line-height: 24px;
   font-size: 8px;
   text-align: center;
   user-select: none;
@@ -80,7 +79,8 @@ export default {
   border: 1px solid #333;
   transition: all 0.5s ease-out;
   transform: translate(0px, 0px);
-  box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.5);
+  font-weight: bold;
+  box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.3);
 }
 
 .po-chip1{
@@ -88,23 +88,23 @@ export default {
 }
 
 .po-chip2{
-  background-position: -38px 0px;
+  background-position: -31px 0px;
 }
 
 .po-chip3{
-  background-position: -76px 0px;
+  background-position: -61px 0px;
 }
 
 .po-chip4{
-  background-position: -114px 0px;
+  background-position: -91px 0px;
 }
 
 .po-chip5{
-  background-position: -153px 0px;
+  background-position: -122px 0px;
 }
 
 .po-chip6{
-  background-position: -191px 0px;
+  background-position: -153px 0px;
 }
 
 .po-chip-hl{

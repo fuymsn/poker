@@ -8,6 +8,14 @@
         :pokerInfo="poker"
         ></poker>
     </div>
+    <div class="po-num-block">
+      <number
+        v-for="item in pokerData"
+        :key="item.id"
+        :numInfo="item"
+      >
+      </number>
+    </div>
     <div class="po-chip-block">
       <chip 
         v-for="chip in chipData"
@@ -28,25 +36,30 @@
       ></chip>
     </div>
 
-    <div>当前选择的卡片: {{ this.currentPoker }}</div>
-    <div>当前押注: {{ this.currentChip }}</div>
-    <div>貂蝉:{{ this.currentSumPoints1 }}</div>
-    <div>西施:{{ this.currentSumPoints2 }}</div>
-    <div>杨贵妃:{{ this.currentSumPoints3 }}</div>
-    <div>如花:{{ this.currentSumPoints4 }}</div>
     <div>押注的总点数: {{ this.currentSumPoints }}</div>
-    <div>操作: <button @click="resetSumPoints">reset</button></div>
-    <div>websocket state</div>
-    <p v-if="isConnected">We're connected to the server!</p>
+    <div>操作: 
+      <button @click="resetSumPoints">重制动画</button>
+      <button @click="closeWS">关闭WS</button>
+      <button @click="pingServer">Ping Server</button>
+    </div>
+    <div>websocket state: <span v-if="isConnected">Connected!</span></div>
     <p>Message from server: "{{ message }}"</p>
-    <button @click="pingServer">Ping Server</button>
+    <div style="height: 300px; overflow-y: scroll">Message List from server: <div v-for="item in messageList" :key="item.cmd">{{ item }}</div></div>
+    <v-dialog name="tips" width="280"></v-dialog>
+    <modal-tip></modal-tip>
+    <transition name="fade">
+      <div class="mask" v-if="maskStatus"></div>
+    </transition>
   </div>
+  
 </template>
 
 <script>
 import { mapState, mapMutations } from 'vuex'
 import Poker from './components/Poker'
 import Chip from './components/Chip'
+import Number from './components/Number'
+import ModalTip from './components/ModalTip'
 import * as types from './store/mutation-types'
 
 export default {
@@ -54,25 +67,30 @@ export default {
   mounted () {
     this.initPoker()
   },
+  data () {
+    return {
+      MSG_GAME_START: '游戏开始了!',
+      MSG_GAME_ROUND_RESULT: '本局开奖结果: ',
+      MSG_GAME_ROUND_PRICE: '您在本局中'
+    }
+  },
   components: {
     Poker,
-    Chip
+    Chip,
+    Number,
+    ModalTip
   },
   computed: {
     ...mapState({
       isConnected: state => state.websocket.isConnected,
       message: state => state.websocket.message,
-      currentPoker: state => state.poker.currentPoker,
-      currentChip: state => state.poker.currentChip,
-      currentSumPoints1: state => state.poker.currentSumPoints1,
-      currentSumPoints2: state => state.poker.currentSumPoints2,
-      currentSumPoints3: state => state.poker.currentSumPoints3,
-      currentSumPoints4: state => state.poker.currentSumPoints4,
+      messageList: state => state.websocket.messageList,
       currentSumPoints: state => state.poker.currentSumPoints,
       chipList: state => state.poker.chipList,
       chipCoord: state => state.poker.chipCoord,
       pokerData: state => state.poker.pokerData,
-      chipData: state => state.poker.chipData
+      chipData: state => state.poker.chipData,
+      maskStatus: state => state.modal.maskStatus
     })
   },
   methods: {
@@ -83,13 +101,24 @@ export default {
       types.SET_POKER_COORD,
       types.SET_CHIP_HEIGHT,
       types.SET_CHIP_WIDTH,
-      types.SET_CHIP_COORD
+      types.SET_CHIP_COORD,
+      types.OPEN_MODAL_TIP,
+      types.SET_MODAL_TIP_TEXT,
+      types.SET_SUM_ITEM_POINTS,
+      types.INIT_GAME,
+      types.END_GAME,
+      types.START_GAME,
+      types.OPEN_MASK,
+      types.CLOSE_MASK
     ]),
     resetSumPoints () {
       this[types.RESET_POINTS]()
     },
     pingServer () {
-      this.$socket.send('pong')
+      this.$socket.sendObj({
+        cmd: 9702001,
+        uid: window.userInfo.uid
+      })
     },
     initPoker () {
       const coordPokerArr = []
@@ -126,12 +155,79 @@ export default {
       })
       this[types.SET_POKER_COORD](coordPokerArr)
       this[types.SET_CHIP_COORD](coordChipArr)
+    },
+    showModalTip (text) {
+      this[types.OPEN_MODAL_TIP]()
+      this[types.SET_MODAL_TIP_TEXT](text)
+    },
+    initGame (gameInfo) {
+      this[types.INIT_GAME](gameInfo)
+    },
+    closeWS () {
+      this.$socket.close()
+    }
+  },
+  watch: {
+    // websocket 返回的数据监听
+    message (msg) {
+      switch (msg.cmd) {
+        // 用户登录
+        case 9702001:
+          this.initGame({
+            beginTime: msg.begtime,
+            currentTime: msg.currtime,
+            bets: msg.bets
+          })
+          break
+        // 押注
+        case 9702002:
+          this.$emit('bet')
+          console.log('押注:' + msg)
+          break
+        // 单点推送押注信息
+        case 9702003:
+          break
+        // 全服广播押注 important
+        case 9702004:
+          msg.beauty.map((key, index) => {
+            this[types.SET_SUM_ITEM_POINTS]({ id: index + 1, point: key })
+          })
+          break
+        // 全服广播输赢中奖
+        case 9702005:
+          this.showModalTip(this.MSG_GAME_ROUND_RESULT + this.pokerData[msg.winner - 1].name)
+          this[types.END_GAME]()
+          this[types.RESET_POINTS]()
+          this[types.OPEN_MASK]()
+          break
+        // 单点推送中奖
+        case 9702006:
+          let priceState = ''
+          if (msg.prize > 0) {
+            priceState = '赢得'
+          } else {
+            priceState = '输掉'
+          }
+          this.showModalTip(this.MSG_GAME_ROUND_PRICE + priceState + Math.abs(msg.prize) + '钻')
+          break
+        // 新的一局游戏开始
+        case 9702007:
+          this.showModalTip(this.MSG_GAME_START)
+          this[types.START_GAME]()
+          this[types.CLOSE_MASK]()
+          break
+        case 9702099:
+          this.showModalTip(msg.content)
+          break
+        default:
+
+      }
     }
   }
 }
 </script>
 
-<style>
+<style scoped>
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -147,10 +243,31 @@ export default {
   margin: 0px 2px;
 }
 
+.po-num-block{
+  display: flex;
+  justify-content: space-around;
+  margin: 0px 2px;
+}
+
 .po-chip-block{
   display: flex;
   justify-content: space-around;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
+.mask{
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  background-color: rgba(0, 0, 0, 0.2)
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s
+}
+.fade-enter, .fade-leave-to{
+  opacity: 0
+}
 </style>

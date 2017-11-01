@@ -14,6 +14,9 @@ import * as types from '../store/mutation-types'
 export default {
   name: 'poker',
   props: ['pokerInfo'],
+  created () {
+    this.$on('bet', this.bet)
+  },
   methods: {
     ...mapMutations([
       types.SELECT_POKER,
@@ -31,43 +34,58 @@ export default {
         pokerId: this.currentPoker,
         chipId: this.currentChip,
         x: parseInt(coord.x + Math.random() * (this.pokerWidth - this.chipWidth), 10),
-        y: parseInt(coord.y + Math.random() * (this.pokerHeight - this.chipHeight), 10)
+        y: parseInt(coord.y + 30 + Math.random() * (this.pokerHeight - this.chipHeight - 30), 10)
       }
     },
-    // 选择扑克牌押注
-    selectPoker (e) {
+    // bet 押注修改数据
+    bet (e) {
       let that = this
-      if (this.currentChip === 0) return
-
       this[types.SELECT_POKER](this.pokerInfo.id)
       this[types.SUM_ITEM_POINTS](this.pokerInfo.id)
       this[types.SUM_POINTS]()
+
       // 向chiplist推送数据
       this[types.UPDATE_CHIP_LIST](this.getChipItem())
 
+      // 添加移动动画
       setTimeout(() => {
         const lastEle = that.chipList[that.chipList.length - 1]
         that.$parent.$refs.chipList.lastChild.style.setProperty('transform', 'translate(' + lastEle.x + 'px,' + lastEle.y + 'px)')
-      }, 100)
+      }, 10)
+    },
+    // 选择扑克牌押注
+    selectPoker (e) {
+      if (this.currentChip === 0) {
+        this.$modal.show('dialog', {
+          title: '提示',
+          text: '请先选择筹码',
+          buttons: [
+            { title: '关闭' }
+          ]
+        })
+        return
+      }
+      this.bet()
       // 向服务器发送数据
-      // this.$socket.sendObj({
-      //   cmd: 9702002,
-      //   uid: 2650001,
-      //   role: 'beauty2',
-      //   point: 200
-      // })
+      this.$socket.sendObj({
+        cmd: 9702002,
+        uid: window.userInfo.uid,
+        role: this.currentPoker,
+        point: this.chipData[this.currentChip - 1].point
+      })
     }
   },
   computed: {
     ...mapState({
-      'currentPoker': state => state.poker.currentPoker,
-      'currentChip': state => state.poker.currentChip,
-      'pokerHeight': state => state.poker.pokerHeight,
-      'pokerWidth': state => state.poker.pokerWidth,
-      'pokerCoord': state => state.poker.pokerCoord,
-      'chipList': state => state.poker.chipList,
-      'chipHeight': state => state.poker.chipHeight,
-      'chipWidth': state => state.poker.chipWidth
+      currentPoker: state => state.poker.currentPoker,
+      currentChip: state => state.poker.currentChip,
+      pokerHeight: state => state.poker.pokerHeight,
+      pokerWidth: state => state.poker.pokerWidth,
+      pokerCoord: state => state.poker.pokerCoord,
+      chipList: state => state.poker.chipList,
+      chipHeight: state => state.poker.chipHeight,
+      chipWidth: state => state.poker.chipWidth,
+      chipData: state => state.poker.chipData
     }),
     chipIdClass () {
       return 'po-poker' + this.pokerInfo.id
@@ -81,8 +99,8 @@ export default {
 
 <style scoped>
 .po-poker{
-    width: 68px;
-    height: 120px;
+    width: 75px;
+    height: 131px;
     border-radius: 10px;
     cursor: pointer;
     line-height: 120px;
