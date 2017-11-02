@@ -20,7 +20,6 @@ export default {
   methods: {
     ...mapMutations([
       types.SELECT_POKER,
-      types.SUM_ITEM_POINTS,
       types.SUM_POINTS,
       types.UPDATE_CHIP_LIST
     ]),
@@ -28,20 +27,20 @@ export default {
     // 获取chipItem信息
     getChipItem () {
       // 获取当前押注顶点坐标
-      const coord = this.pokerCoord[this.currentPoker - 1]
+      const coord = this.pokerCoord[this.currentBetPoker - 1]
 
       return {
-        pokerId: this.currentPoker,
-        chipId: this.currentChip,
+        pokerId: this.currentBetPoker,
+        chipId: this.currentBetChip,
         x: parseInt(coord.x + Math.random() * (this.pokerWidth - this.chipWidth), 10),
         y: parseInt(coord.y + 30 + Math.random() * (this.pokerHeight - this.chipHeight - 30), 10)
       }
     },
     // bet 押注修改数据
-    bet (e) {
+    bet () {
       let that = this
-      this[types.SELECT_POKER](this.pokerInfo.id)
-      this[types.SUM_ITEM_POINTS](this.pokerInfo.id)
+
+      // 我总的押注信息
       this[types.SUM_POINTS]()
 
       // 向chiplist推送数据
@@ -65,14 +64,17 @@ export default {
         })
         return
       }
-      this.bet()
+      this[types.SELECT_POKER](this.pokerInfo.id)
+      // this.bet()
       // 向服务器发送数据
+      // setTimeout(() => {
       this.$socket.sendObj({
         cmd: 9702002,
         uid: window.userInfo.uid,
         role: this.currentPoker,
-        point: this.chipData[this.currentChip - 1].point
+        point: this.currentChip
       })
+      // })
     }
   },
   computed: {
@@ -85,7 +87,9 @@ export default {
       chipList: state => state.poker.chipList,
       chipHeight: state => state.poker.chipHeight,
       chipWidth: state => state.poker.chipWidth,
-      chipData: state => state.poker.chipData
+      chipData: state => state.poker.chipData,
+      currentBetPoker: state => state.poker.currentBetPoker,
+      currentBetChip: state => state.poker.currentBetChip
     }),
     chipIdClass () {
       return 'po-poker' + this.pokerInfo.id

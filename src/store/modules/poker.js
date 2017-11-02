@@ -39,7 +39,9 @@ const state = {
   chipHeight: 0,
   chipWidth: 0,
   chipCoord: [], // chip的坐标
-  chipList: [] // { id: chipid, x: x坐标, y: y坐标 }
+  chipList: [], // { id: chipid, x: x坐标, y: y坐标 }
+  currentBetPoker: 0, // 当前押注(来自服务器)
+  currentBetChip: 0 // 当前选卡(来自服务器)
 }
 
 const getters = {
@@ -77,10 +79,10 @@ const mutations = {
     state.sumPoints3 = 0
     state.sumPoints4 = 0
   },
-  [types.SUM_ITEM_POINTS]: (state, id) => {
-    state['currentSumPoints' + id] = (state['currentSumPoints' + id] || 0) + state.currentPoint
+  [types.SET_SELF_ITEM_POINTS]: (state, { id, point }) => {
+    state['currentSumPoints' + id] = point
   },
-  [types.SET_SUM_ITEM_POINTS]: (state, {id, point}) => {
+  [types.SET_SUM_ITEM_POINTS]: (state, { id, point }) => {
     state['sumPoints' + id] = point
   },
 
@@ -114,6 +116,13 @@ const mutations = {
 
   [types.UPDATE_CHIP_LIST]: (state, chipItem) => {
     state.chipList.push(chipItem)
+  },
+
+  [types.SET_BET_POKER_FROM_SERVER]: (state, role) => {
+    state.currentBetPoker = role
+  },
+  [types.SET_BET_CHIP_FROM_SERVER]: (state, chip) => {
+    state.currentBetChip = chip
   }
 }
 

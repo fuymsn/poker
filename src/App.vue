@@ -85,6 +85,7 @@ export default {
       isConnected: state => state.websocket.isConnected,
       message: state => state.websocket.message,
       messageList: state => state.websocket.messageList,
+      currentPoker: state => state.poker.currentPoker,
       currentSumPoints: state => state.poker.currentSumPoints,
       chipList: state => state.poker.chipList,
       chipCoord: state => state.poker.chipCoord,
@@ -109,7 +110,10 @@ export default {
       types.END_GAME,
       types.START_GAME,
       types.OPEN_MASK,
-      types.CLOSE_MASK
+      types.CLOSE_MASK,
+      types.SET_BET_POKER_FROM_SERVER,
+      types.SET_BET_CHIP_FROM_SERVER,
+      types.SET_SELF_ITEM_POINTS
     ]),
     resetSumPoints () {
       this[types.RESET_POINTS]()
@@ -181,11 +185,14 @@ export default {
           break
         // 押注
         case 9702002:
-          this.$emit('bet')
-          console.log('押注:' + msg)
+          this[types.SET_BET_POKER_FROM_SERVER](msg.role)
+          this[types.SET_BET_CHIP_FROM_SERVER](msg.point)
+          this.$refs['p' + msg.role][0].bet()
           break
-        // 单点推送押注信息
+        // 用户单点推送押注信息
         case 9702003:
+          // 我的押注
+          this[types.SET_SELF_ITEM_POINTS]({ id: msg.role, point: msg.total })
           break
         // 全服广播押注 important
         case 9702004:

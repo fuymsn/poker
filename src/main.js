@@ -11,7 +11,7 @@ import base64 from 'base-64'
 
 var testInfo = {
   gameid: 9702,
-  uid: 2650007,
+  uid: 1394510,
   rid: 2650010,
   token: '43606811c7305ccc6abb2be116579bfd'
 }
