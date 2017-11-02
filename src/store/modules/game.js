@@ -1,10 +1,12 @@
 import * as types from '../mutation-types'
 
 const state = {
-  state: 0,
+  status: 0,
   beginTime: 0,
   currentTime: 0,
-  bets: []
+  bets: [],
+  betLong: 0,
+  resultLong: 0
 }
 
 const getters = {
@@ -21,19 +23,21 @@ const getters = {
 }
 
 const mutations = {
-  [types.INIT_GAME]: (state, {beginTime, currentTime, bets}) => {
+  [types.INIT_GAME]: (state, {beginTime, currentTime, bets, betLong, resultLong}) => {
     state.beginTime = beginTime
     state.currentTime = currentTime
     state.bets = bets
+    state.betLong = betLong
+    state.resultLong = resultLong
   },
-  [types.SET_GAME_STATE]: (state, gameState) => {
-    state.state = gameState
+  [types.SET_GAME_STATUS]: (state, gameStatus) => {
+    state.status = gameStatus
   },
   [types.START_GAME]: (state) => {
-    state.state = 1
+    state.status = 1
   },
   [types.END_GAME]: (state) => {
-    state.state = 0
+    state.status = 0
   }
 }
 

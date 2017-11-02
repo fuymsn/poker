@@ -48,7 +48,9 @@
     <v-dialog name="tips" width="280"></v-dialog>
     <modal-tip></modal-tip>
     <transition name="fade">
-      <div class="mask" v-if="maskStatus"></div>
+      <div class="mask" v-if="maskStatus">
+        <div class="mask-text">休息一会儿, 即将开始 {{ resultCountTime }}</div>
+      </div>
     </transition>
   </div>
   
@@ -71,7 +73,8 @@ export default {
     return {
       MSG_GAME_START: '游戏开始了!',
       MSG_GAME_ROUND_RESULT: '本局开奖结果: ',
-      MSG_GAME_ROUND_PRICE: '您在本局中'
+      MSG_GAME_ROUND_PRICE: '您在本局中',
+      resultCountTime: 0
     }
   },
   components: {
@@ -91,7 +94,9 @@ export default {
       chipCoord: state => state.poker.chipCoord,
       pokerData: state => state.poker.pokerData,
       chipData: state => state.poker.chipData,
-      maskStatus: state => state.modal.maskStatus
+      maskStatus: state => state.modal.maskStatus,
+      resultLong: state => state.game.resultLong,
+      status: state => state.game.status
     })
   },
   methods: {
@@ -180,7 +185,9 @@ export default {
           this.initGame({
             beginTime: msg.begtime,
             currentTime: msg.currtime,
-            bets: msg.bets
+            bets: msg.bets,
+            betLong: msg.betlong,
+            resultLong: msg.resultlong
           })
           break
         // 押注
@@ -229,6 +236,17 @@ export default {
         default:
 
       }
+    },
+    status (status) {
+      this.resultCountTime = (this.resultLong + 1000) / 1000
+      if (status === 0) {
+        let count = setInterval(() => {
+          if (this.resultCountTime > 0) {
+            this.resultCountTime --
+          }
+          if (this.resultCountTime === 0) { clearInterval(count) }
+        }, 1000)
+      }
     }
   }
 }
@@ -271,8 +289,21 @@ export default {
   background-color: rgba(0, 0, 0, 0.2)
 }
 
+.mask-text{
+  background-color: #fff;
+  padding: 10px 20px;
+  box-shadow: 0px 0px 5px 2px rgba(0,0,0,0.4);
+  border-radius: 50px;
+  position: absolute;
+  left: 50%;
+  margin-left: -82px;
+  margin-top: 20px;
+  user-select: none;
+  font-size: 12px;
+}
+
 .fade-enter-active, .fade-leave-active {
-  transition: opacity .5s
+  transition: opacity .3s
 }
 .fade-enter, .fade-leave-to{
   opacity: 0

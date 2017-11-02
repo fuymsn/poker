@@ -2,7 +2,7 @@ import * as types from '../mutation-types'
 
 const state = {
   currentPoker: 0,
-  currentChip: 0,
+  currentChip: 1,
   currentPoint: 0,
 
   // 用户自身投注数据
@@ -66,7 +66,7 @@ const mutations = {
   },
   [types.RESET_POINTS]: (state) => {
     state.currentPoker = 0
-    state.currentChip = 0
+    // state.currentChip = 0
     state.currentPoint = 0
     state.currentSumPoints = 0
     state.currentSumPoints1 = 0

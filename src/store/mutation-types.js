@@ -38,7 +38,7 @@ export const OPEN_MASK = 'OPEN_MASK'
 export const CLOSE_MASK = 'CLOSE_MASK'
 
 // game
-export const SET_GAME_STATE = 'SET_GAME_STATE'
+export const SET_GAME_STATUS = 'SET_GAME_STATUS'
 export const START_GAME = 'START_GAME'
 export const END_GAME = 'END_GAME'
 export const INIT_GAME = 'INIT_GAME'
