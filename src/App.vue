@@ -25,7 +25,6 @@
         :chipInfo="{ chipId: chip.id }"
         ></chip>
     </div>
-
     <div ref="chipList">
       <chip 
       v-for="item in chipList" 
@@ -35,14 +34,14 @@
       type='move'
       ></chip>
     </div>
-
-    <div>押注的总点数: {{ this.currentSumPoints }}</div>
-    <div>操作: 
-      <button @click="resetSumPoints">重制动画</button>
-      <button @click="closeWS">关闭WS</button>
-      <button @click="pingServer">Ping Server</button>
-    </div>
-    <div>websocket state: <span v-if="isConnected">Connected!</span></div>
+    <p>
+      <div>押注的总点数: {{ this.currentSumPoints }}</div>
+      <div>操作: 
+        <button @click="resetSumPoints">重制动画</button>
+        <button @click="closeWS">关闭WS</button>
+        <button @click="pingServer">Ping Server</button>
+      </div>
+    </p>
     <p>Message from server: "{{ message }}"</p>
     <div style="height: 300px; overflow-y: scroll">Message List from server: <div v-for="item in messageList" :key="item.cmd">{{ item }}</div></div>
     <v-dialog name="tips" width="280"></v-dialog>
@@ -52,21 +51,31 @@
         <div class="mask-text">休息一会儿, 即将开始 {{ resultCountTime }}</div>
       </div>
     </transition>
+    <transition name="fade">
+      <div class="dialog" v-if="dialogStatus">
+        <div class="dialog-title"></div>
+        <div class="dialog-content">游戏开始</br>选择筹码, 点击美女开始押注</div>
+      </div>
+    </transition>
+    <connect-status></connect-status>
   </div>
   
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex'
+import { mapState, mapMutations, mapGetters } from 'vuex'
 import Poker from './components/Poker'
 import Chip from './components/Chip'
 import Number from './components/Number'
 import ModalTip from './components/ModalTip'
+import ConnectStatus from './components/ConnectStatus'
 import * as types from './store/mutation-types'
 
 export default {
   name: 'app',
   mounted () {
+    // 游戏创建完成
+    this[types.CREATED]()
     this.initPoker()
   },
   data () {
@@ -81,11 +90,11 @@ export default {
     Poker,
     Chip,
     Number,
-    ModalTip
+    ModalTip,
+    ConnectStatus
   },
   computed: {
     ...mapState({
-      isConnected: state => state.websocket.isConnected,
       message: state => state.websocket.message,
       messageList: state => state.websocket.messageList,
       currentPoker: state => state.poker.currentPoker,
@@ -93,10 +102,13 @@ export default {
       chipList: state => state.poker.chipList,
       chipCoord: state => state.poker.chipCoord,
       pokerData: state => state.poker.pokerData,
-      chipData: state => state.poker.chipData,
       maskStatus: state => state.modal.maskStatus,
+      dialogStatus: state => state.modal.dialogStatus,
       resultLong: state => state.game.resultLong,
       status: state => state.game.status
+    }),
+    ...mapGetters({
+      chipData: 'chipData'
     })
   },
   methods: {
@@ -105,9 +117,6 @@ export default {
       types.SET_POKER_HEIGHT,
       types.SET_POKER_WIDTH,
       types.SET_POKER_COORD,
-      types.SET_CHIP_HEIGHT,
-      types.SET_CHIP_WIDTH,
-      types.SET_CHIP_COORD,
       types.OPEN_MODAL_TIP,
       types.SET_MODAL_TIP_TEXT,
       types.SET_SUM_ITEM_POINTS,
@@ -116,9 +125,12 @@ export default {
       types.START_GAME,
       types.OPEN_MASK,
       types.CLOSE_MASK,
+      types.OPEN_DIALOG,
+      types.CLOSE_DIALOG,
       types.SET_BET_POKER_FROM_SERVER,
       types.SET_BET_CHIP_FROM_SERVER,
-      types.SET_SELF_ITEM_POINTS
+      types.SET_SELF_ITEM_POINTS,
+      types.CREATED
     ]),
     resetSumPoints () {
       this[types.RESET_POINTS]()
@@ -131,20 +143,16 @@ export default {
     },
     initPoker () {
       const coordPokerArr = []
-      const coordChipArr = []
       const that = this
       // 设置poker宽高
       this[types.SET_POKER_HEIGHT](this.$refs.p1[0].$el.offsetHeight)
       this[types.SET_POKER_WIDTH](this.$refs.p1[0].$el.offsetWidth)
-      // 设置chip宽高
-      this[types.SET_CHIP_HEIGHT](this.$refs.c1[0].$el.offsetHeight)
-      this[types.SET_CHIP_WIDTH](this.$refs.c1[0].$el.offsetWidth)
+
       // 保存poker数据点
       Object.keys(this.$refs).map((key, index) => {
         let el = that.$refs[key]
         // 如果未定义
         if (!Array.isArray(el)) return
-
         // 获取ref el
         let refEl = el[0].$el
         // poker coord
@@ -154,16 +162,8 @@ export default {
             y: refEl.offsetTop
           })
         }
-        // chip coord
-        if (/po-chip/.test(refEl.className)) {
-          coordChipArr.push({
-            x: refEl.offsetLeft,
-            y: refEl.offsetTop
-          })
-        }
       })
       this[types.SET_POKER_COORD](coordPokerArr)
-      this[types.SET_CHIP_COORD](coordChipArr)
     },
     showModalTip (text) {
       this[types.OPEN_MODAL_TIP]()
@@ -211,7 +211,6 @@ export default {
         case 9702005:
           this.showModalTip(this.MSG_GAME_ROUND_RESULT + this.pokerData[msg.winner - 1].name)
           this[types.END_GAME]()
-          this[types.RESET_POINTS]()
           this[types.OPEN_MASK]()
           break
         // 单点推送中奖
@@ -226,19 +225,25 @@ export default {
           break
         // 新的一局游戏开始
         case 9702007:
-          this.showModalTip(this.MSG_GAME_START)
+          // this.showModalTip(this.MSG_GAME_START)
+          this[types.RESET_POINTS]()
+          this[types.OPEN_DIALOG]()
           this[types.START_GAME]()
           this[types.CLOSE_MASK]()
+          let startDialog = setTimeout(() => {
+            this[types.CLOSE_DIALOG]()
+            clearTimeout(startDialog)
+          }, 2000)
           break
         case 9702099:
           this.showModalTip(msg.content)
           break
         default:
-
+          break
       }
     },
     status (status) {
-      this.resultCountTime = (this.resultLong + 1000) / 1000
+      this.resultCountTime = this.resultLong / 1000
       if (status === 0) {
         let count = setInterval(() => {
           if (this.resultCountTime > 0) {
@@ -266,6 +271,7 @@ export default {
   display: flex;
   justify-content: space-around;
   margin: 0px 2px;
+  margin-top: 10px;
 }
 
 .po-num-block{
@@ -300,6 +306,27 @@ export default {
   margin-top: 20px;
   user-select: none;
   font-size: 12px;
+}
+
+.dialog{
+  width: 150px;
+  height: 78px;
+  background-image: url(./assets/tip.png);
+  background-size: contain;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -75px;
+  margin-top: -39px;
+  color: #ffcf90;
+  padding: 13px 20px;
+  box-sizing: border-box;
+}
+.dialog-title{
+
+}
+.dialog-content{
+  font-size: 11px;
 }
 
 .fade-enter-active, .fade-leave-active {

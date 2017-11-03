@@ -15,10 +15,37 @@ import * as types from '../store/mutation-types'
 export default {
   name: 'chip',
   props: ['chipInfo', 'type', 'chipStyle'],
+  mounted () {
+    // 初始化 chip 数据
+    if (this.chipCoord.length < this.bets.length) {
+      this.initChip()
+    }
+  },
   methods: {
     ...mapMutations([
-      types.SELECT_CHIP
+      types.SELECT_CHIP,
+      types.SET_CHIP_HEIGHT,
+      types.SET_CHIP_WIDTH,
+      types.APPEND_CHIP_COORD
     ]),
+    initChip () {
+      // 获取ref el
+      let el = this.$el
+      // 设置chip宽高
+      this[types.SET_CHIP_HEIGHT](el.offsetHeight)
+      this[types.SET_CHIP_WIDTH](el.offsetWidth)
+      // chip coord
+      if (/po-chip/.test(el.className)) {
+        this[types.APPEND_CHIP_COORD]({
+          x: el.offsetLeft,
+          y: el.offsetTop
+        })
+      }
+    },
+    /**
+     * @argument
+     * 押注
+     */
     bet (e) {
       if (this.type === 'move') return
       let id = this.chipInfo.chipId
@@ -31,6 +58,8 @@ export default {
   },
   computed: {
     ...mapState({
+      chipCoord: state => state.poker.chipCoord,
+      bets: state => state.game.bets,
       currentChip: state => state.poker.currentChip
     }),
     ...mapGetters({
@@ -65,51 +94,31 @@ export default {
 <style scoped>
 .po-chip{
   border-radius: 100px;
-  width: 24px;
-  height: 24px;
+  width: 25px;
+  height: 25px;
   margin: 0px 5px;
   cursor: pointer;
-  line-height: 24px;
-  font-size: 8px;
+  line-height: 25px;
+  font-size: 6px;
   text-align: center;
   user-select: none;
   background-image: url(../assets/chip.png);
   background-size: cover;
-  color: #fff;
-  border: 1px solid #333;
+  color: #333;
+  /* border: 1px solid #333; */
   transition: all 0.5s ease-out;
   transform: translate(0px, 0px);
-  font-weight: bold;
+  /* font-weight: bold; */
   box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.3);
 }
 
-.po-chip1{
-  background-position: 0px 0px;
-}
-
-.po-chip2{
-  background-position: -31px 0px;
-}
-
-.po-chip3{
-  background-position: -61px 0px;
-}
-
-.po-chip4{
-  background-position: -91px 0px;
-}
-
-.po-chip5{
-  background-position: -122px 0px;
-}
-
-.po-chip6{
-  background-position: -153px 0px;
-}
-
-.po-chip-hl{
-  animation: chipShine 3s infinite;
-}
+.po-chip1{ background-position: 0px 0px; }
+.po-chip2{ background-position: -26px 0px; }
+.po-chip3{ background-position: -53px 0px; }
+.po-chip4{ background-position: -79px 0px; }
+.po-chip5{ background-position: -105px 0px; }
+.po-chip6{ background-position: -131px 0px; }
+.po-chip-hl{ animation: chipShine 3s infinite; }
 
 .po-chip-move{
   position: absolute;

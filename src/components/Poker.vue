@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from 'vuex'
+import { mapMutations, mapGetters, mapState } from 'vuex'
 import * as types from '../store/mutation-types'
 
 export default {
@@ -87,9 +87,11 @@ export default {
       chipList: state => state.poker.chipList,
       chipHeight: state => state.poker.chipHeight,
       chipWidth: state => state.poker.chipWidth,
-      chipData: state => state.poker.chipData,
       currentBetPoker: state => state.poker.currentBetPoker,
       currentBetChip: state => state.poker.currentBetChip
+    }),
+    ...mapGetters({
+      chipData: 'chipData'
     }),
     chipIdClass () {
       return 'po-poker' + this.pokerInfo.id

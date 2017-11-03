@@ -27,15 +27,6 @@ const state = {
   pokerHeight: 0,
   pokerWidth: 0,
   pokerCoord: [], // poker的坐标
-
-  chipData: [
-    { id: 1, point: 10, name: '10' },
-    { id: 2, point: 100, name: '100' },
-    { id: 3, point: 1000, name: '1千' },
-    { id: 4, point: 10000, name: '1万' },
-    { id: 5, point: 100000, name: '10万' },
-    { id: 6, point: 500000, name: '50万' }
-  ],
   chipHeight: 0,
   chipWidth: 0,
   chipCoord: [], // chip的坐标
@@ -45,9 +36,6 @@ const state = {
 }
 
 const getters = {
-  getChipItemById: (state, getters) => (id) => {
-    return state.chipData.find(item => item.id === id)
-  },
   getCurrentSumPointsItemById: (state, getters) => (id) => {
     return state['currentSumPoints' + id]
   },
@@ -110,8 +98,8 @@ const mutations = {
     state.chipHeight = height
   },
 
-  [types.SET_CHIP_COORD]: (state, coordinatesArray) => {
-    state.chipCoord = coordinatesArray
+  [types.APPEND_CHIP_COORD]: (state, coordinates) => {
+    state.chipCoord.push(coordinates)
   },
 
   [types.UPDATE_CHIP_LIST]: (state, chipItem) => {

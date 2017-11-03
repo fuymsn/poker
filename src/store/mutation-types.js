@@ -18,7 +18,7 @@ export const SET_POKER_COORD = 'SET_POKER_COORD'
 
 export const SET_CHIP_WIDTH = 'SET_CHIP_WIDTH'
 export const SET_CHIP_HEIGHT = 'SET_CHIP_HEIGHT'
-export const SET_CHIP_COORD = 'SET_CHIP_COORD'
+export const APPEND_CHIP_COORD = 'APPEND_CHIP_COORD'
 // set bet role from server
 export const SET_BET_POKER_FROM_SERVER = 'SET_BET_POKER_FROM_SERVER'
 export const SET_BET_CHIP_FROM_SERVER = 'SET_BET_CHIP_FROM_SERVER'
@@ -36,9 +36,12 @@ export const CLOSE_MODAL_TIP = 'CLOSE_MODAL_TIP'
 export const SET_MODAL_TIP_TEXT = 'SET_MODAL_TIP_TEXT'
 export const OPEN_MASK = 'OPEN_MASK'
 export const CLOSE_MASK = 'CLOSE_MASK'
+export const OPEN_DIALOG = 'OPEN_DIALOG'
+export const CLOSE_DIALOG = 'CLOSE_DIALOG'
 
 // game
 export const SET_GAME_STATUS = 'SET_GAME_STATUS'
 export const START_GAME = 'START_GAME'
 export const END_GAME = 'END_GAME'
 export const INIT_GAME = 'INIT_GAME'
+export const CREATED = 'CREATED'

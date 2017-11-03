@@ -3,7 +3,8 @@ import * as types from '../mutation-types'
 const state = {
   modalTipState: 0,
   modalTipText: 0,
-  maskStatus: 0
+  maskStatus: 0,
+  dialogStatus: 0
 }
 
 const mutations = {
@@ -21,6 +22,12 @@ const mutations = {
   },
   [types.CLOSE_MASK]: (state) => {
     state.maskStatus = 0
+  },
+  [types.OPEN_DIALOG]: (state) => {
+    state.dialogStatus = 1
+  },
+  [types.CLOSE_DIALOG]: (state) => {
+    state.dialogStatus = 0
   }
 }
 
