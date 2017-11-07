@@ -8,16 +8,18 @@ const state = {
 
 const mutations = {
   [types.WS_OPEN]: (state) => {
-    state.isConnected = true
+    state.isConnected = 1
     console.log('websocket connected')
   },
   // close message
   [types.WS_CLOSE]: (state) => {
-    state.isConnected = false
+    state.isConnected = 0
     console.log('websocket disconneted')
   },
   // error message
   [types.WS_ERROR]: (state, status) => {
+    state.isConnected = 2
+    console.log('websocket error')
     console.error(status)
   },
   // receive message

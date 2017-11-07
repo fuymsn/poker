@@ -17,7 +17,14 @@ export default {
       isConnected: state => state.websocket.isConnected
     }),
     connectStateClass () {
-      return this.isConnected ? 'po-connected' : 'po-disconnected'
+      switch (this.isConnected) {
+        case 0:
+          return 'po-disconnected'
+        case 1:
+          return 'po-connected'
+        case 2:
+          return 'po-connect-error'
+      }
     }
   }
 }
@@ -38,5 +45,8 @@ export default {
 }
 .po-disconnected{
   background-color: #d14836;
+}
+.po-connect-error{
+  background-color: #eac81f;
 }
 </style>

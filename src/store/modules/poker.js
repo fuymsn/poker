@@ -32,7 +32,9 @@ const state = {
   chipCoord: [], // chip的坐标
   chipList: [], // { id: chipid, x: x坐标, y: y坐标 }
   currentBetPoker: 0, // 当前押注(来自服务器)
-  currentBetChip: 0 // 当前选卡(来自服务器)
+  currentBetChip: 0, // 当前选卡(来自服务器)
+  winner: 0, // 开牌, 并在压注的时候归零
+  winnerBgList: [1, 1, 1, 1]
 }
 
 const getters = {
@@ -41,6 +43,18 @@ const getters = {
   },
   getSumPointsItemById: (state, getters) => (id) => {
     return state['sumPoints' + id]
+  },
+  // [0, 0, 0, 0] //1正面, 0背面
+  getWinnerBgList: (state, getters) => () => {
+    let list = []
+    state.pokerData.map((item) => {
+      if (state.winner === item.id) {
+        list.push(1)
+      } else {
+        list.push(0)
+      }
+    })
+    return list
   }
 }
 
@@ -111,6 +125,9 @@ const mutations = {
   },
   [types.SET_BET_CHIP_FROM_SERVER]: (state, chip) => {
     state.currentBetChip = chip
+  },
+  [types.SET_WINNER]: (state, winner) => {
+    state.winner = winner
   }
 }
 

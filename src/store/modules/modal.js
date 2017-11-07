@@ -4,7 +4,8 @@ const state = {
   modalTipState: 0,
   modalTipText: 0,
   maskStatus: 0,
-  dialogStatus: 0
+  dialogStatus: 0,
+  dialogText: ''
 }
 
 const mutations = {
@@ -23,8 +24,9 @@ const mutations = {
   [types.CLOSE_MASK]: (state) => {
     state.maskStatus = 0
   },
-  [types.OPEN_DIALOG]: (state) => {
+  [types.OPEN_DIALOG]: (state, { text }) => {
     state.dialogStatus = 1
+    state.dialogText = text
   },
   [types.CLOSE_DIALOG]: (state) => {
     state.dialogStatus = 0

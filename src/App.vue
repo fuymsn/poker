@@ -37,7 +37,7 @@
     <p>
       <div>押注的总点数: {{ this.currentSumPoints }}</div>
       <div>操作: 
-        <button @click="resetSumPoints">重制动画</button>
+        <button @click="resetSumPoints">重制</button>
         <button @click="closeWS">关闭WS</button>
         <button @click="pingServer">Ping Server</button>
       </div>
@@ -54,7 +54,7 @@
     <transition name="fade">
       <div class="dialog" v-if="dialogStatus">
         <div class="dialog-title"></div>
-        <div class="dialog-content">游戏开始</br>选择筹码, 点击美女开始押注</div>
+        <div class="dialog-content" v-html="dialogText"></div>
       </div>
     </transition>
     <connect-status></connect-status>
@@ -80,9 +80,9 @@ export default {
   },
   data () {
     return {
-      MSG_GAME_START: '游戏开始了!',
+      MSG_GAME_START: '游戏开始<br/>选择筹码, 点击美女开始押注',
       MSG_GAME_ROUND_RESULT: '本局开奖结果: ',
-      MSG_GAME_ROUND_PRICE: '您在本局中',
+      MSG_GAME_ROUND_PRICE: '您在本局中<br/>',
       resultCountTime: 0
     }
   },
@@ -104,6 +104,7 @@ export default {
       pokerData: state => state.poker.pokerData,
       maskStatus: state => state.modal.maskStatus,
       dialogStatus: state => state.modal.dialogStatus,
+      dialogText: state => state.modal.dialogText,
       resultLong: state => state.game.resultLong,
       status: state => state.game.status
     }),
@@ -130,7 +131,8 @@ export default {
       types.SET_BET_POKER_FROM_SERVER,
       types.SET_BET_CHIP_FROM_SERVER,
       types.SET_SELF_ITEM_POINTS,
-      types.CREATED
+      types.CREATED,
+      types.SET_WINNER
     ]),
     resetSumPoints () {
       this[types.RESET_POINTS]()
@@ -209,7 +211,8 @@ export default {
           break
         // 全服广播输赢中奖
         case 9702005:
-          this.showModalTip(this.MSG_GAME_ROUND_RESULT + this.pokerData[msg.winner - 1].name)
+          // this.showModalTip(this.MSG_GAME_ROUND_RESULT + this.pokerData[msg.winner - 1].name)
+          this[types.SET_WINNER](msg.winner)
           this[types.END_GAME]()
           this[types.OPEN_MASK]()
           break
@@ -221,15 +224,21 @@ export default {
           } else {
             priceState = '输掉'
           }
-          this.showModalTip(this.MSG_GAME_ROUND_PRICE + priceState + Math.abs(msg.prize) + '钻')
+          this[types.OPEN_DIALOG]({ text: this.MSG_GAME_ROUND_PRICE + priceState + Math.abs(msg.prize) + '钻' })
+          let winDialog = setTimeout(() => {
+            this[types.CLOSE_DIALOG]()
+            clearTimeout(winDialog)
+          }, 3000)
           break
         // 新的一局游戏开始
         case 9702007:
           // this.showModalTip(this.MSG_GAME_START)
           this[types.RESET_POINTS]()
-          this[types.OPEN_DIALOG]()
+          this[types.OPEN_DIALOG]({ text: this.MSG_GAME_START })
           this[types.START_GAME]()
           this[types.CLOSE_MASK]()
+          // 重置胜利卡牌
+          this[types.SET_WINNER](0)
           let startDialog = setTimeout(() => {
             this[types.CLOSE_DIALOG]()
             clearTimeout(startDialog)
@@ -272,6 +281,7 @@ export default {
   justify-content: space-around;
   margin: 0px 2px;
   margin-top: 10px;
+  perspective: 1200px;
 }
 
 .po-num-block{

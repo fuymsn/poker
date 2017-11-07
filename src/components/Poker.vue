@@ -1,7 +1,7 @@
 <template>
   <div 
     class="po-poker"
-    :class="[chipIdClass, highlightClass]"
+    :class="pokerComposeClass"
     @click.prevent="selectPoker"
   >{{ pokerInfo.name }}
   </div>
@@ -14,6 +14,12 @@ import * as types from '../store/mutation-types'
 export default {
   name: 'poker',
   props: ['pokerInfo'],
+  data () {
+    return {
+      pokerBgClass: '',
+      currentWinner: 0
+    }
+  },
   created () {
     this.$on('bet', this.bet)
   },
@@ -21,7 +27,8 @@ export default {
     ...mapMutations([
       types.SELECT_POKER,
       types.SUM_POINTS,
-      types.UPDATE_CHIP_LIST
+      types.UPDATE_CHIP_LIST,
+      types.SET_WINNER
     ]),
 
     // 获取chipItem信息
@@ -54,6 +61,7 @@ export default {
     },
     // 选择扑克牌押注
     selectPoker (e) {
+      // let that = this
       if (this.currentChip === 0) {
         this.$modal.show('dialog', {
           title: '提示',
@@ -64,7 +72,12 @@ export default {
         })
         return
       }
+
+      // 当前选择的poker
       this[types.SELECT_POKER](this.pokerInfo.id)
+      // setTimeout(() => {
+      //   that.$el.className = that.$el.className + ' ' + this.pokerBgClass
+      // }, 500)
       // this.bet()
       // 向服务器发送数据
       // setTimeout(() => {
@@ -88,16 +101,40 @@ export default {
       chipHeight: state => state.poker.chipHeight,
       chipWidth: state => state.poker.chipWidth,
       currentBetPoker: state => state.poker.currentBetPoker,
-      currentBetChip: state => state.poker.currentBetChip
+      currentBetChip: state => state.poker.currentBetChip,
+      winner: state => state.poker.winner,
+      status: state => state.game.status
     }),
     ...mapGetters({
-      chipData: 'chipData'
+      chipData: 'chipData',
+      getWinnerBgList: 'getWinnerBgList'
     }),
+    pokerComposeClass () {
+      return [this.chipIdClass, this.highlightClass, this.pokerBgClass]
+    },
+    flipClass () {
+      return 'po-poker-flip'
+    },
     chipIdClass () {
       return 'po-poker' + this.pokerInfo.id
     },
     highlightClass () {
       return this.pokerInfo.id === this.currentPoker ? 'po-poker-hl' : ''
+    }
+  },
+  watch: {
+    winner (winner) {
+      if (winner) {
+        this.pokerBgClass = this.pokerInfo.id === this.winner ? '' : 'po-poker-flip-down po-bg'
+      } else {
+        this.pokerBgClass = this.pokerInfo.id === this.currentWinner ? '' : 'po-poker-flip-up'
+      }
+    },
+    // 当前每一局卡牌开牌, 开局后保持不变
+    currentWinner  () {
+      if (this.winner > 0) {
+        return this.winner
+      }
     }
   }
 }
@@ -115,6 +152,8 @@ export default {
     margin: 10px 2px;
     background-size: cover;
     text-indent: -9999px;
+    transform: rotateX(0deg);
+    transform-style: preserve-3d;
 }
 
 .po-poker1{
@@ -130,7 +169,17 @@ export default {
     background-image: url(../assets/poker_yang.png)
 }
 .po-poker-hl{
-    animation:chipShine 3s infinite 
+    animation:chipShine 1s infinite;
+}
+.po-poker-flip-down{
+    animation:flipPokerDown 1s;
+}
+.po-poker-flip-up{
+    animation:flipPokerUp 1s;
+}
+.po-bg{
+    background-image: url(../assets/poker_bg.png);
+    transform: rotateY(180deg);
 }
 
 @keyframes chipShine {
@@ -139,4 +188,26 @@ export default {
     100% { box-shadow: 0px 0px 0px 0px yellow; }
 }
 
+@keyframes flipPokerDown {
+  0% { 
+    transform: rotateY(0deg);
+  }
+  50% {
+    background-image: url(../assets/poker_bg.png);
+  }
+  100% {
+    transform: rotateY(-180deg);
+  }
+}
+
+@keyframes flipPokerUp {
+  0% { 
+    transform: rotateY(-180deg);
+  }
+  50% { 
+  }
+  100% {
+    transform: rotateY(0deg);
+  }
+}
 </style>

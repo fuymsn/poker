@@ -130,9 +130,9 @@ export default {
 }
 
 @keyframes chipShine {
-    0%   {box-shadow: 0px 0px 0px 0px yellow;}
-    50%  {box-shadow: 0px 0px 10px 2px yellow;}
-    100% {box-shadow: 0px 0px 0px 0px yellow;}
+  0%   {box-shadow: 0px 0px 0px 0px yellow;}
+  50%  {box-shadow: 0px 0px 10px 2px yellow;}
+  100% {box-shadow: 0px 0px 0px 0px yellow;}
 }
 
 </style>
