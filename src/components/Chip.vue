@@ -105,10 +105,8 @@ export default {
   background-image: url(../assets/chip.png);
   background-size: cover;
   color: #333;
-  /* border: 1px solid #333; */
   transition: all 0.5s ease-out;
   transform: translate(0px, 0px);
-  /* font-weight: bold; */
   box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.3);
 }
 

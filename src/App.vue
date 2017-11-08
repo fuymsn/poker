@@ -47,16 +47,12 @@
     <v-dialog name="tips" width="280"></v-dialog>
     <modal-tip></modal-tip>
     <transition name="fade">
-      <div class="mask" v-if="maskStatus">
-        <div class="mask-text">休息一会儿, 即将开始 {{ resultCountTime }}</div>
-      </div>
-    </transition>
-    <transition name="fade">
       <div class="dialog" v-if="dialogStatus">
         <div class="dialog-title"></div>
         <div class="dialog-content" v-html="dialogText"></div>
       </div>
     </transition>
+    <modal-alert></modal-alert>
     <connect-status></connect-status>
   </div>
   
@@ -68,6 +64,7 @@ import Poker from './components/Poker'
 import Chip from './components/Chip'
 import Number from './components/Number'
 import ModalTip from './components/ModalTip'
+import ModalAlert from './components/ModalAlert'
 import ConnectStatus from './components/ConnectStatus'
 import * as types from './store/mutation-types'
 
@@ -91,6 +88,7 @@ export default {
     Chip,
     Number,
     ModalTip,
+    ModalAlert,
     ConnectStatus
   },
   computed: {
@@ -102,10 +100,11 @@ export default {
       chipList: state => state.poker.chipList,
       chipCoord: state => state.poker.chipCoord,
       pokerData: state => state.poker.pokerData,
-      maskStatus: state => state.modal.maskStatus,
+      modalAlertMaskStatus: state => state.modal.modalAlertMaskStatus,
       dialogStatus: state => state.modal.dialogStatus,
       dialogText: state => state.modal.dialogText,
       resultLong: state => state.game.resultLong,
+      betLong: state => state.game.betLong,
       status: state => state.game.status
     }),
     ...mapGetters({
@@ -120,12 +119,15 @@ export default {
       types.SET_POKER_COORD,
       types.OPEN_MODAL_TIP,
       types.SET_MODAL_TIP_TEXT,
+      types.OPEN_MODAL_ALERT,
+      types.CLOSE_MODAL_ALERT,
+      types.OPEN_MODAL_ALERT_MASK,
+      types.CLOSE_MODAL_ALERT_MASK,
+      types.SET_MODAL_ALERT_TEXT,
       types.SET_SUM_ITEM_POINTS,
       types.INIT_GAME,
       types.END_GAME,
       types.START_GAME,
-      types.OPEN_MASK,
-      types.CLOSE_MASK,
       types.OPEN_DIALOG,
       types.CLOSE_DIALOG,
       types.SET_BET_POKER_FROM_SERVER,
@@ -176,6 +178,38 @@ export default {
     },
     closeWS () {
       this.$socket.close()
+    },
+    showSleepAlert () {
+      this[types.OPEN_MODAL_ALERT]()
+      this[types.OPEN_MODAL_ALERT_MASK]()
+      this.secondCount(this.resultLong, (count) => {
+        this[types.SET_MODAL_ALERT_TEXT]('休息一会儿, 即将开始' + count)
+      })
+    },
+    hideSleepAlert () {
+      this[types.CLOSE_MODAL_ALERT]()
+      this[types.CLOSE_MODAL_ALERT_MASK]()
+    },
+    showBetAlert () {
+      let betLong = this.betLong - 2000
+      this[types.OPEN_MODAL_ALERT]()
+      this.secondCount(betLong, (count) => {
+        this[types.SET_MODAL_ALERT_TEXT]('押注时间还剩' + count)
+      })
+    },
+    hideBetAlert () {
+      this[types.CLOSE_MODAL_ALERT]()
+    },
+    secondCount (timeCost, callback) {
+      let resultCountTime = timeCost / 1000
+      if (callback) callback(resultCountTime)
+      let count = setInterval(() => {
+        if (resultCountTime > 0) {
+          if (callback) callback(resultCountTime - 1)
+          resultCountTime--
+        }
+        if (resultCountTime === 0) { clearInterval(count) }
+      }, 1000)
     }
   },
   watch: {
@@ -214,7 +248,8 @@ export default {
           // this.showModalTip(this.MSG_GAME_ROUND_RESULT + this.pokerData[msg.winner - 1].name)
           this[types.SET_WINNER](msg.winner)
           this[types.END_GAME]()
-          this[types.OPEN_MASK]()
+          this.hideBetAlert()
+          this.showSleepAlert()
           break
         // 单点推送中奖
         case 9702006:
@@ -236,12 +271,14 @@ export default {
           this[types.RESET_POINTS]()
           this[types.OPEN_DIALOG]({ text: this.MSG_GAME_START })
           this[types.START_GAME]()
-          this[types.CLOSE_MASK]()
+          this.hideSleepAlert()
           // 重置胜利卡牌
           this[types.SET_WINNER](0)
           let startDialog = setTimeout(() => {
             this[types.CLOSE_DIALOG]()
             clearTimeout(startDialog)
+            // 倒记时
+            this.showBetAlert()
           }, 2000)
           break
         case 9702099:
@@ -249,17 +286,6 @@ export default {
           break
         default:
           break
-      }
-    },
-    status (status) {
-      this.resultCountTime = this.resultLong / 1000
-      if (status === 0) {
-        let count = setInterval(() => {
-          if (this.resultCountTime > 0) {
-            this.resultCountTime --
-          }
-          if (this.resultCountTime === 0) { clearInterval(count) }
-        }, 1000)
       }
     }
   }
@@ -280,7 +306,7 @@ export default {
   display: flex;
   justify-content: space-around;
   margin: 0px 2px;
-  margin-top: 10px;
+  margin-top: 30px;
   perspective: 1200px;
 }
 
@@ -295,29 +321,6 @@ export default {
   justify-content: space-around;
   margin-top: 10px;
 }
-
-.mask{
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  background-color: rgba(0, 0, 0, 0.2)
-}
-
-.mask-text{
-  background-color: #fff;
-  padding: 10px 20px;
-  box-shadow: 0px 0px 5px 2px rgba(0,0,0,0.4);
-  border-radius: 50px;
-  position: absolute;
-  left: 50%;
-  margin-left: -82px;
-  margin-top: 20px;
-  user-select: none;
-  font-size: 12px;
-}
-
 .dialog{
   width: 150px;
   height: 78px;
@@ -331,6 +334,7 @@ export default {
   color: #ffcf90;
   padding: 13px 20px;
   box-sizing: border-box;
+  z-index: 11;
 }
 .dialog-title{
 

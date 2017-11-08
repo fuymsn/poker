@@ -13,7 +13,7 @@ export default {
   props: ['modalText'],
   computed: {
     ...mapState({
-      modalTipState: state => state.modal.modalTipState,
+      modalTipStatus: state => state.modal.modalTipStatus,
       modalTipText: state => state.modal.modalTipText
     })
   },
@@ -31,8 +31,8 @@ export default {
     }
   },
   watch: {
-    modalTipState () {
-      if (this.modalTipState === 1) {
+    modalTipStatus () {
+      if (this.modalTipStatus === 1) {
         this.show()
       }
     }

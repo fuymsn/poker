@@ -1,28 +1,39 @@
 import * as types from '../mutation-types'
 
 const state = {
-  modalTipState: 0,
-  modalTipText: 0,
-  maskStatus: 0,
+  modalTipStatus: 0,
+  modalTipText: '',
+  modalAlertStatus: 0,
+  modalAlertMaskStatus: 0,
+  modalAlertText: '',
   dialogStatus: 0,
   dialogText: ''
 }
 
 const mutations = {
   [types.OPEN_MODAL_TIP]: (state) => {
-    state.modalTipState = 1
+    state.modalTipStatus = 1
   },
   [types.CLOSE_MODAL_TIP]: (state) => {
-    state.modalTipState = 0
+    state.modalTipStatus = 0
   },
   [types.SET_MODAL_TIP_TEXT]: (state, text) => {
     state.modalTipText = text
   },
-  [types.OPEN_MASK]: (state) => {
-    state.maskStatus = 1
+  [types.OPEN_MODAL_ALERT]: (state) => {
+    state.modalAlertStatus = 1
   },
-  [types.CLOSE_MASK]: (state) => {
-    state.maskStatus = 0
+  [types.CLOSE_MODAL_ALERT]: (state) => {
+    state.modalAlertStatus = 0
+  },
+  [types.OPEN_MODAL_ALERT_MASK]: (state) => {
+    state.modalAlertMaskStatus = 1
+  },
+  [types.CLOSE_MODAL_ALERT_MASK]: (state) => {
+    state.modalAlertMaskStatus = 0
+  },
+  [types.SET_MODAL_ALERT_TEXT]: (state, text) => {
+    state.modalAlertText = text
   },
   [types.OPEN_DIALOG]: (state, { text }) => {
     state.dialogStatus = 1

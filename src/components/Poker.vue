@@ -16,12 +16,13 @@ export default {
   props: ['pokerInfo'],
   data () {
     return {
-      pokerBgClass: '',
+      // 卡牌背景
+      pokerBgDownClass: false,
+      pokerBgUpClass: false,
+      pokerBgClass: false,
+      // 当前每一局卡牌开牌, 开局后保持不变
       currentWinner: 0
     }
-  },
-  created () {
-    this.$on('bet', this.bet)
   },
   methods: {
     ...mapMutations([
@@ -30,17 +31,15 @@ export default {
       types.UPDATE_CHIP_LIST,
       types.SET_WINNER
     ]),
-
     // 获取chipItem信息
     getChipItem () {
       // 获取当前押注顶点坐标
       const coord = this.pokerCoord[this.currentBetPoker - 1]
-
       return {
         pokerId: this.currentBetPoker,
         chipId: this.currentBetChip,
         x: parseInt(coord.x + Math.random() * (this.pokerWidth - this.chipWidth), 10),
-        y: parseInt(coord.y + 30 + Math.random() * (this.pokerHeight - this.chipHeight - 30), 10)
+        y: parseInt(coord.y + 50 + Math.random() * (this.pokerHeight - this.chipHeight - 20), 10)
       }
     },
     // bet 押注修改数据
@@ -110,30 +109,44 @@ export default {
       getWinnerBgList: 'getWinnerBgList'
     }),
     pokerComposeClass () {
-      return [this.chipIdClass, this.highlightClass, this.pokerBgClass]
+      return {
+        'po-poker-hl': this.pokerInfo.id === this.currentPoker,
+        ['po-poker' + this.pokerInfo.id]: true,
+        'po-bg': this.pokerBgClass,
+        'po-poker-flip-down': this.pokerBgDownClass,
+        'po-poker-flip-up': this.pokerBgUpClass
+      }
     },
     flipClass () {
       return 'po-poker-flip'
-    },
-    chipIdClass () {
-      return 'po-poker' + this.pokerInfo.id
-    },
-    highlightClass () {
-      return this.pokerInfo.id === this.currentPoker ? 'po-poker-hl' : ''
     }
   },
   watch: {
     winner (winner) {
-      if (winner) {
-        this.pokerBgClass = this.pokerInfo.id === this.winner ? '' : 'po-poker-flip-down po-bg'
-      } else {
-        this.pokerBgClass = this.pokerInfo.id === this.currentWinner ? '' : 'po-poker-flip-up'
+      let that = this
+      if (winner > 0) {
+        this.currentWinner = this.winner
       }
-    },
-    // 当前每一局卡牌开牌, 开局后保持不变
-    currentWinner  () {
-      if (this.winner > 0) {
-        return this.winner
+      if (winner) {
+        this.pokerBgDownClass = this.pokerInfo.id !== this.winner
+        let bgDelayStart = setTimeout(() => {
+          that.pokerBgClass = this.pokerInfo.id !== this.winner
+          clearTimeout(bgDelayStart)
+        }, 500)
+        let bgDelayStartStop = setTimeout(() => {
+          this.pokerBgDownClass = false
+          clearTimeout(bgDelayStartStop)
+        }, 2000)
+      } else {
+        this.pokerBgUpClass = this.pokerInfo.id !== this.currentWinner
+        let bgDelayEnd = setTimeout(() => {
+          that.pokerBgClass = false
+          clearTimeout(bgDelayEnd)
+        }, 500)
+        let bgDelayEndStop = setTimeout(() => {
+          this.pokerBgUpClass = false
+          clearTimeout(bgDelayEndStop)
+        }, 2000)
       }
     }
   }
@@ -189,22 +202,23 @@ export default {
 }
 
 @keyframes flipPokerDown {
-  0% { 
+  0% {
     transform: rotateY(0deg);
   }
   50% {
     background-image: url(../assets/poker_bg.png);
   }
   100% {
-    transform: rotateY(-180deg);
+    transform: rotateY(180deg);
   }
 }
 
 @keyframes flipPokerUp {
   0% { 
-    transform: rotateY(-180deg);
+    transform: rotateY(180deg);
   }
-  50% { 
+  50% {
+    background-image: url(../assets/poker_bg.png);
   }
   100% {
     transform: rotateY(0deg);
