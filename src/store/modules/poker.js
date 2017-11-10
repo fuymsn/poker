@@ -89,7 +89,7 @@ const mutations = {
   },
 
   [types.SUM_POINTS]: (state) => {
-    state.currentSumPoints = state.currentSumPoints + state.currentPoint
+    state.currentSumPoints = state.currentSumPoints1 + state.currentSumPoints2 + state.currentSumPoints3 + state.currentSumPoints4
   },
 
   [types.SET_POKER_WIDTH]: (state, width) => {
