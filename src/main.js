@@ -30,6 +30,7 @@ Vue.use(VueNativeSock, userInfo.ws + '/websocket?request=' + userInfoEncode, { s
 Vue.use(VModal, { dialog: true })
 
 Vue.config.productionTip = false
+Vue.config.devtools = true
 
 /* eslint-disable no-new */
 new Vue({

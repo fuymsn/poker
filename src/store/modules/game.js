@@ -16,6 +16,7 @@ const _chipValueList = [
   { id: 1000000, name: '100万' },
   { id: 5000000, name: '500万' }
 ]
+
 // 通过id获取筹码value
 const _getChipNameById = (id) => {
   let item = _chipValueList.find(item => item.id === id)
@@ -30,7 +31,8 @@ const state = {
   bets: [],
   betLong: 0,
   resultLong: 0,
-  point: 0
+  point: 0,
+  heartBeatStatus: 1 // 1 心跳连通, 2 心跳断开
 }
 
 const getters = {
@@ -73,6 +75,12 @@ const mutations = {
   },
   [types.SET_POINT]: (state, point) => {
     state.point = point
+  },
+  [types.START_HEART_BEAT]: (state) => {
+    state.heartBeatStatus = 1
+  },
+  [types.STOP_HEART_BEAT]: (state) => {
+    state.heartBeatStatus = 0
   }
 }
 

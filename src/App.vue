@@ -41,12 +41,12 @@
         <button @click="resetSumPoints">重制</button>
         <button @click="closeWS">关闭WS</button>
         <button @click="getGameInfo">001</button>
-        <button @click="pingServer">Ping Server</button>
+        <button @click="pingServer">心跳</button>
       </div>
     </p>
     <p>Message from server: "{{ message }}"</p>
     <div style="height: 300px; overflow-y: scroll">Message List from server: <div v-for="item in messageList" :key="item.cmd">{{ item }}</div></div>
-    <v-dialog name="tips" width="280"></v-dialog>
+    <v-dialog width="280"></v-dialog>
     <modal-tip></modal-tip>
     <transition name="fade">
       <div class="dialog" v-if="dialogStatus">
@@ -73,16 +73,32 @@ import * as types from './store/mutation-types'
 export default {
   name: 'app',
   mounted () {
+    let that = this
     // 游戏创建完成
     this[types.CREATED]()
     this.initPoker()
+
+    // 启动心跳
+    let heartBeat = setInterval(() => {
+      that.pingServer()
+      // 如果socket没有回应
+      // if (!that.heartBeatSendStatus) {
+      //   // 断开
+      //   that[types.STOP_HEART_BEAT]()
+      // }
+      // 如果心跳停止，停止发送
+      if (!that.heartBeatStatus) {
+        clearInterval(heartBeat)
+      }
+    }, 10000)
   },
   data () {
     return {
       MSG_GAME_START: '游戏开始<br/>选择筹码, 点击美女开始押注',
       MSG_GAME_ROUND_RESULT: '本局开奖结果: ',
       MSG_GAME_ROUND_PRICE: '您在本局中<br/>',
-      resultCountTime: 0
+      resultCountTime: 0,
+      heartBeatSendStatus: 0 // 发送状态: 有回应1, 没有回应0
     }
   },
   components: {
@@ -108,7 +124,8 @@ export default {
       resultLong: state => state.game.resultLong,
       betLong: state => state.game.betLong,
       status: state => state.game.status,
-      point: state => state.game.point
+      point: state => state.game.point,
+      heartBeatStatus: state => state.game.heartBeatStatus
     }),
     ...mapGetters({
       chipData: 'chipData'
@@ -138,22 +155,33 @@ export default {
       types.SET_SELF_ITEM_POINTS,
       types.CREATED,
       types.SET_WINNER,
-      types.SET_POINT
+      types.SET_POINT,
+      types.START_HEART_BEAT,
+      types.STOP_HEART_BEAT
     ]),
     resetSumPoints () {
       this[types.RESET_POINTS]()
     },
     getGameInfo () {
+      // 手动获取游戏信息
       this.$socket.sendObj({
         cmd: 9702001,
         uid: window.userInfo.uid
       })
     },
     pingServer () {
+      let that = this
       // 发送心跳111
       this.$socket.sendObj({
         cmd: 9702111
       })
+      this.heartBeatSendStatus = 0
+      setTimeout(() => {
+        // 判断是否有回应
+        if (!that.heartBeatSendStatus) {
+          that[types.STOP_HEART_BEAT]()
+        }
+      }, 5000)
     },
     initPoker () {
       const coordPokerArr = []
@@ -294,11 +322,37 @@ export default {
             this.showBetAlert()
           }, 2000)
           break
+        // 报错
         case 9702099:
           this.showModalTip(msg.content)
           break
+        // 心跳
+        case 9702111:
+          // 如果回应，但是回应太慢，同样会断开并重连
+          // 如果没有回应，则在未回应处处理
+          this.heartBeatSendStatus = 1
+          // if (this.heartBeatSendStatus === 1) {
+          //   this[types.START_HEART_BEAT]()
+          // } else {
+          //   this[types.STOP_HEART_BEAT]()
+          // }
+          break
         default:
           break
+      }
+    },
+    // 心跳监听
+    heartBeatStatus (heartBeatStatus) {
+      if (!heartBeatStatus) {
+        this.$modal.show('dialog', {
+          title: '提示',
+          text: '网络已经断开, 请稍后再试或点击"重连"',
+          clickToClose: false,
+          buttons: [
+            { title: '重连', handler: () => { location.reload() } },
+            { title: '关闭' }
+          ]
+        })
       }
     }
   }
