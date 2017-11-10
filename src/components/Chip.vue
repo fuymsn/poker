@@ -107,7 +107,6 @@ export default {
   color: #333;
   transition: all 0.5s ease-out;
   transform: translate(0px, 0px);
-  box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.3);
 }
 
 .po-chip1{ background-position: 0px 0px; }

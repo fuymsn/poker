@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <div class="po-point"><div class="po-diamond"></div><div class="po-diamond-num">{{ point }}</div></div>
     <div class="po-poker-block">
       <poker 
         v-for="poker in pokerData"
@@ -39,6 +40,7 @@
       <div>操作: 
         <button @click="resetSumPoints">重制</button>
         <button @click="closeWS">关闭WS</button>
+        <button @click="getGameInfo">001</button>
         <button @click="pingServer">Ping Server</button>
       </div>
     </p>
@@ -105,7 +107,8 @@ export default {
       dialogText: state => state.modal.dialogText,
       resultLong: state => state.game.resultLong,
       betLong: state => state.game.betLong,
-      status: state => state.game.status
+      status: state => state.game.status,
+      point: state => state.game.point
     }),
     ...mapGetters({
       chipData: 'chipData'
@@ -134,15 +137,22 @@ export default {
       types.SET_BET_CHIP_FROM_SERVER,
       types.SET_SELF_ITEM_POINTS,
       types.CREATED,
-      types.SET_WINNER
+      types.SET_WINNER,
+      types.SET_POINT
     ]),
     resetSumPoints () {
       this[types.RESET_POINTS]()
     },
-    pingServer () {
+    getGameInfo () {
       this.$socket.sendObj({
         cmd: 9702001,
         uid: window.userInfo.uid
+      })
+    },
+    pingServer () {
+      // 发送心跳111
+      this.$socket.sendObj({
+        cmd: 9702111
       })
     },
     initPoker () {
@@ -223,7 +233,8 @@ export default {
             currentTime: msg.currtime,
             bets: msg.bets,
             betLong: msg.betlong,
-            resultLong: msg.resultlong
+            resultLong: msg.resultlong,
+            point: msg.point
           })
           break
         // 押注
@@ -236,6 +247,7 @@ export default {
         case 9702003:
           // 我的押注
           this[types.SET_SELF_ITEM_POINTS]({ id: msg.role, point: msg.total })
+          this[types.SET_POINT](msg.point)
           break
         // 全服广播押注 important
         case 9702004:
@@ -264,6 +276,7 @@ export default {
             this[types.CLOSE_DIALOG]()
             clearTimeout(winDialog)
           }, 3000)
+          this[types.SET_POINT](msg.point)
           break
         // 新的一局游戏开始
         case 9702007:
@@ -302,6 +315,31 @@ export default {
   overflow: hidden;
 }
 
+.po-point{
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 15;
+}
+
+.po-diamond{
+  background-image: url(./assets/diamond.png);
+  width: 15px;
+  height: 12px;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+.po-diamond-num{
+  text-shadow: 1px 1px 0px rgba(0,0,0,0.5), 1px -1px 0px rgba(0,0,0,0.5), -1px 1px 0px rgba(0,0,0,0.5), -1px -1px 0px rgba(0,0,0,0.5);
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffef00;
+  line-height: 20px;
+  display: inline-block;
+  vertical-align: middle;
+}
 .po-poker-block{
   display: flex;
   justify-content: space-around;
