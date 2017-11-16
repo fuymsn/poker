@@ -32,13 +32,13 @@ export default {
 
 .alert-text{
   background-color: #fff;
-  padding: 3px 10px;
-  box-shadow: 0px 0px 5px 2px rgba(0,0,0,0.4);
+  padding: 1px 6px;
+  box-shadow: 0px 0px 3px 1px rgba(0,0,0,0.4);
   border-radius: 50px;
   position: absolute;
   left: 50%;
-  margin-left: -75px;
-  margin-top: 9px;
+  margin-left: -71px;
+  margin-top: 3px;
   user-select: none;
   font-size: 12px;
   z-index: 10;
@@ -53,7 +53,7 @@ export default {
   position: absolute;
   top: 0px;
   left: 0px;
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0);
   z-index: 9;
 }
 </style>

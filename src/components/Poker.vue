@@ -5,6 +5,7 @@
     @click.prevent="selectPoker"
   >{{ pokerInfo.name }}
   </div>
+  
 </template>
 
 <script>
@@ -39,7 +40,7 @@ export default {
         pokerId: this.currentBetPoker,
         chipId: this.currentBetChip,
         x: parseInt(coord.x + Math.random() * (this.pokerWidth - this.chipWidth), 10),
-        y: parseInt(coord.y + 50 + Math.random() * (this.pokerHeight - this.chipHeight - 20), 10)
+        y: -parseInt(coord.y + Math.random() * (this.pokerHeight - this.chipHeight - 40), 10)
       }
     },
     // bet 押注修改数据
@@ -155,14 +156,14 @@ export default {
 
 <style scoped>
 .po-poker{
-    width: 75px;
-    height: 131px;
+    width: 24vw;
+    height: calc(24vw / 0.57);
     border-radius: 10px;
     cursor: pointer;
     line-height: 120px;
     text-align: center;
     user-select: none;
-    margin: 10px 2px;
+    margin: 0px 2px;
     background-size: cover;
     text-indent: -9999px;
     transform: rotateX(0deg);

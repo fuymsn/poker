@@ -1,14 +1,7 @@
 <template>
   <div id="app">
-    <div class="po-point"><div class="po-diamond"></div><div class="po-diamond-num">{{ point }}</div></div>
-    <div class="po-poker-block">
-      <poker 
-        v-for="poker in pokerData"
-        :ref="'p' + poker.id"
-        :key="poker.id"
-        :pokerInfo="poker"
-        ></poker>
-    </div>
+    <!-- <div>{{ pokerCoord || pokerCoord[0] }}</div>
+    <div>{{ chipCoord || chipCoord[0] }}</div> -->
     <div class="po-num-block">
       <number
         v-for="item in pokerData"
@@ -17,7 +10,20 @@
       >
       </number>
     </div>
+    <div class="po-poker-block">
+      <poker 
+        v-for="poker in pokerData"
+        :ref="'p' + poker.id"
+        :key="poker.id"
+        :pokerInfo="poker"
+        ></poker>
+    </div>
     <div class="po-chip-block">
+      <div class="po-point">
+        <button class="po-charge-btn">充值</button>
+        <div class="po-diamond"></div>
+        <div class="po-diamond-num">{{ point }}</div>
+      </div>
       <chip 
         v-for="chip in chipData"
         type='btn'
@@ -26,16 +32,17 @@
         :chipInfo="{ chipId: chip.id }"
         ></chip>
     </div>
-    <div ref="chipList">
+    <div class="po-chip-animation" ref="chipList">
       <chip 
       v-for="item in chipList" 
       :chipInfo="item"
       :key="item.x"
-      :chipStyle="{ transform: 'translate(' + chipCoord[item.chipId-1].x + 'px, ' + chipCoord[item.chipId-1].y + 'px)' }"
+      :chipStyle="{ transform: 'translate(' + chipCoord[item.chipId-1].x + 'px, -' + chipHeight + 'px)' }"
       type='move'
       ></chip>
     </div>
-    <p>
+    
+    <!-- <p>
       <div>押注的总点数: {{ this.currentSumPoints }}</div>
       <div>操作: 
         <button @click="resetSumPoints">重制</button>
@@ -45,7 +52,10 @@
       </div>
     </p>
     <p>Message from server: "{{ message }}"</p>
-    <div style="height: 300px; overflow-y: scroll">Message List from server: <div v-for="item in messageList" :key="item.cmd">{{ item }}</div></div>
+    <div style="height: 300px; overflow-y: scroll">
+      Message List from server: <div v-for="item in messageList" :key="item.cmd">{{ item }}</div>
+    </div> -->
+
     <v-dialog width="280"></v-dialog>
     <modal-tip></modal-tip>
     <transition name="fade">
@@ -117,7 +127,9 @@ export default {
       currentSumPoints: state => state.poker.currentSumPoints,
       chipList: state => state.poker.chipList,
       chipCoord: state => state.poker.chipCoord,
+      pokerCoord: state => state.poker.pokerCoord,
       pokerData: state => state.poker.pokerData,
+      chipHeight: state => state.poker.chipHeight,
       modalAlertMaskStatus: state => state.modal.modalAlertMaskStatus,
       dialogStatus: state => state.modal.dialogStatus,
       dialogText: state => state.modal.dialogText,
@@ -201,7 +213,7 @@ export default {
         if (/po-poker/.test(refEl.className)) {
           coordPokerArr.push({
             x: refEl.offsetLeft,
-            y: refEl.offsetTop
+            y: refEl.parentElement.offsetTop // fix ios's offset value is different from others platform
           })
         }
       })
@@ -367,13 +379,12 @@ export default {
   text-align: center;
   color: #2c3e50;
   overflow: hidden;
+  opacity: 0.6;
 }
 
 .po-point{
-  position: absolute;
-  top: 10px;
-  left: 10px;
   z-index: 15;
+  margin-left: 5px;
 }
 
 .po-diamond{
@@ -382,7 +393,6 @@ export default {
   height: 12px;
   display: inline-block;
   vertical-align: middle;
-  margin-right: 5px;
 }
 
 .po-diamond-num{
@@ -394,24 +404,38 @@ export default {
   display: inline-block;
   vertical-align: middle;
 }
+.po-charge-btn{
+  background-color: #f8065d;
+  border: 0px;
+  color: #fff;
+  font-size: 9px;
+  border-radius: 5px;
+  width: 36px;
+  height: 20px;
+  line-height: 20px;
+}
+
 .po-poker-block{
   display: flex;
   justify-content: space-around;
   margin: 0px 2px;
-  margin-top: 30px;
   perspective: 1200px;
 }
 
 .po-num-block{
   display: flex;
   justify-content: space-around;
-  margin: 0px 2px;
+  margin: 25px 2px 0px 2px;
 }
 
 .po-chip-block{
   display: flex;
   justify-content: space-around;
   margin-top: 10px;
+  align-items: center;
+}
+.po-chip-animation{
+  position: relative;
 }
 .dialog{
   width: 150px;

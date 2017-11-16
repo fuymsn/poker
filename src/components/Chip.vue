@@ -96,7 +96,7 @@ export default {
   border-radius: 100px;
   width: 25px;
   height: 25px;
-  margin: 0px 5px;
+  margin: 0px 1px;
   cursor: pointer;
   line-height: 25px;
   font-size: 6px;
