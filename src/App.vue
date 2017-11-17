@@ -1,7 +1,5 @@
 <template>
   <div id="app">
-    <!-- <div>{{ pokerCoord || pokerCoord[0] }}</div>
-    <div>{{ chipCoord || chipCoord[0] }}</div> -->
     <div class="po-num-block">
       <number
         v-for="item in pokerData"
@@ -20,7 +18,7 @@
     </div>
     <div class="po-chip-block">
       <div class="po-point">
-        <button class="po-charge-btn">充值</button>
+        <button class="po-charge-btn" @click="charge">充值</button>
         <div class="po-diamond"></div>
         <div class="po-diamond-num">{{ point }}</div>
       </div>
@@ -41,21 +39,7 @@
       type='move'
       ></chip>
     </div>
-    
-    <!-- <p>
-      <div>押注的总点数: {{ this.currentSumPoints }}</div>
-      <div>操作: 
-        <button @click="resetSumPoints">重制</button>
-        <button @click="closeWS">关闭WS</button>
-        <button @click="getGameInfo">001</button>
-        <button @click="pingServer">心跳</button>
-      </div>
-    </p>
-    <p>Message from server: "{{ message }}"</p>
-    <div style="height: 300px; overflow-y: scroll">
-      Message List from server: <div v-for="item in messageList" :key="item.cmd">{{ item }}</div>
-    </div> -->
-
+    <Test></Test>
     <v-dialog width="280"></v-dialog>
     <modal-tip></modal-tip>
     <transition name="fade">
@@ -74,10 +58,12 @@
 import { mapState, mapMutations, mapGetters } from 'vuex'
 import Poker from './components/Poker'
 import Chip from './components/Chip'
+import Test from './components/Test'
 import Number from './components/Number'
 import ModalTip from './components/ModalTip'
 import ModalAlert from './components/ModalAlert'
 import ConnectStatus from './components/ConnectStatus'
+import ClientAPI from './api/client'
 import * as types from './store/mutation-types'
 
 export default {
@@ -114,6 +100,7 @@ export default {
   components: {
     Poker,
     Chip,
+    Test,
     Number,
     ModalTip,
     ModalAlert,
@@ -122,20 +109,14 @@ export default {
   computed: {
     ...mapState({
       message: state => state.websocket.message,
-      messageList: state => state.websocket.messageList,
-      currentPoker: state => state.poker.currentPoker,
-      currentSumPoints: state => state.poker.currentSumPoints,
       chipList: state => state.poker.chipList,
       chipCoord: state => state.poker.chipCoord,
-      pokerCoord: state => state.poker.pokerCoord,
       pokerData: state => state.poker.pokerData,
       chipHeight: state => state.poker.chipHeight,
-      modalAlertMaskStatus: state => state.modal.modalAlertMaskStatus,
       dialogStatus: state => state.modal.dialogStatus,
       dialogText: state => state.modal.dialogText,
       resultLong: state => state.game.resultLong,
       betLong: state => state.game.betLong,
-      status: state => state.game.status,
       point: state => state.game.point,
       heartBeatStatus: state => state.game.heartBeatStatus
     }),
@@ -168,19 +149,8 @@ export default {
       types.CREATED,
       types.SET_WINNER,
       types.SET_POINT,
-      types.START_HEART_BEAT,
       types.STOP_HEART_BEAT
     ]),
-    resetSumPoints () {
-      this[types.RESET_POINTS]()
-    },
-    getGameInfo () {
-      // 手动获取游戏信息
-      this.$socket.sendObj({
-        cmd: 9702001,
-        uid: window.userInfo.uid
-      })
-    },
     pingServer () {
       let that = this
       // 发送心跳111
@@ -226,9 +196,6 @@ export default {
     initGame (gameInfo) {
       this[types.INIT_GAME](gameInfo)
     },
-    closeWS () {
-      this.$socket.close()
-    },
     showSleepAlert () {
       this[types.OPEN_MODAL_ALERT]()
       this[types.OPEN_MODAL_ALERT_MASK]()
@@ -260,6 +227,9 @@ export default {
         }
         if (resultCountTime === 0) { clearInterval(count) }
       }, 1000)
+    },
+    charge () {
+      ClientAPI.chargeAction()
     }
   },
   watch: {
@@ -297,7 +267,6 @@ export default {
           break
         // 全服广播输赢中奖
         case 9702005:
-          // this.showModalTip(this.MSG_GAME_ROUND_RESULT + this.pokerData[msg.winner - 1].name)
           this[types.SET_WINNER](msg.winner)
           this[types.END_GAME]()
           this.hideBetAlert()
@@ -343,11 +312,6 @@ export default {
           // 如果回应，但是回应太慢，同样会断开并重连
           // 如果没有回应，则在未回应处处理
           this.heartBeatSendStatus = 1
-          // if (this.heartBeatSendStatus === 1) {
-          //   this[types.START_HEART_BEAT]()
-          // } else {
-          //   this[types.STOP_HEART_BEAT]()
-          // }
           break
         default:
           break
@@ -408,11 +372,11 @@ export default {
   background-color: #f8065d;
   border: 0px;
   color: #fff;
-  font-size: 9px;
+  font-size: 10px;
   border-radius: 5px;
-  width: 36px;
-  height: 20px;
-  line-height: 20px;
+  width: 40px;
+  height: 22px;
+  line-height: 22px;
 }
 
 .po-poker-block{
