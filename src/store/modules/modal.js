@@ -5,7 +5,6 @@ const state = {
   modalTipText: '',
   modalAlertStatus: 0,
   modalAlertMaskStatus: 0,
-  modalAlertText: '',
   dialogStatus: 0,
   dialogText: ''
 }
@@ -31,9 +30,6 @@ const mutations = {
   },
   [types.CLOSE_MODAL_ALERT_MASK]: (state) => {
     state.modalAlertMaskStatus = 0
-  },
-  [types.SET_MODAL_ALERT_TEXT]: (state, text) => {
-    state.modalAlertText = text
   },
   [types.OPEN_DIALOG]: (state, { text }) => {
     state.dialogStatus = 1

@@ -17,11 +17,7 @@
         ></poker>
     </div>
     <div class="po-chip-block">
-      <div class="po-point">
-        <button class="po-charge-btn" @click="charge">充值</button>
-        <div class="po-diamond"></div>
-        <div class="po-diamond-num">{{ point }}</div>
-      </div>
+      <point></point>
       <chip 
         v-for="chip in chipData"
         type='btn'
@@ -59,11 +55,11 @@ import { mapState, mapMutations, mapGetters } from 'vuex'
 import Poker from './components/Poker'
 import Chip from './components/Chip'
 import Test from './components/Test'
+import Point from './components/Point'
 import Number from './components/Number'
 import ModalTip from './components/ModalTip'
 import ModalAlert from './components/ModalAlert'
 import ConnectStatus from './components/ConnectStatus'
-import ClientAPI from './api/client'
 import * as types from './store/mutation-types'
 
 export default {
@@ -101,6 +97,7 @@ export default {
     Poker,
     Chip,
     Test,
+    Point,
     Number,
     ModalTip,
     ModalAlert,
@@ -115,9 +112,8 @@ export default {
       chipHeight: state => state.poker.chipHeight,
       dialogStatus: state => state.modal.dialogStatus,
       dialogText: state => state.modal.dialogText,
-      resultLong: state => state.game.resultLong,
-      betLong: state => state.game.betLong,
-      point: state => state.game.point,
+      // resultLong: state => state.game.resultLong,
+      // betLong: state => state.game.betLong,
       heartBeatStatus: state => state.game.heartBeatStatus
     }),
     ...mapGetters({
@@ -132,11 +128,6 @@ export default {
       types.SET_POKER_COORD,
       types.OPEN_MODAL_TIP,
       types.SET_MODAL_TIP_TEXT,
-      types.OPEN_MODAL_ALERT,
-      types.CLOSE_MODAL_ALERT,
-      types.OPEN_MODAL_ALERT_MASK,
-      types.CLOSE_MODAL_ALERT_MASK,
-      types.SET_MODAL_ALERT_TEXT,
       types.SET_SUM_ITEM_POINTS,
       types.INIT_GAME,
       types.END_GAME,
@@ -195,41 +186,6 @@ export default {
     },
     initGame (gameInfo) {
       this[types.INIT_GAME](gameInfo)
-    },
-    showSleepAlert () {
-      this[types.OPEN_MODAL_ALERT]()
-      this[types.OPEN_MODAL_ALERT_MASK]()
-      this.secondCount(this.resultLong, (count) => {
-        this[types.SET_MODAL_ALERT_TEXT]('休息一会儿, 即将开始' + count)
-      })
-    },
-    hideSleepAlert () {
-      this[types.CLOSE_MODAL_ALERT]()
-      this[types.CLOSE_MODAL_ALERT_MASK]()
-    },
-    showBetAlert () {
-      let betLong = this.betLong - 2000
-      this[types.OPEN_MODAL_ALERT]()
-      this.secondCount(betLong, (count) => {
-        this[types.SET_MODAL_ALERT_TEXT]('押注时间还剩' + count)
-      })
-    },
-    hideBetAlert () {
-      this[types.CLOSE_MODAL_ALERT]()
-    },
-    secondCount (timeCost, callback) {
-      let resultCountTime = timeCost / 1000
-      if (callback) callback(resultCountTime)
-      let count = setInterval(() => {
-        if (resultCountTime > 0) {
-          if (callback) callback(resultCountTime - 1)
-          resultCountTime--
-        }
-        if (resultCountTime === 0) { clearInterval(count) }
-      }, 1000)
-    },
-    charge () {
-      ClientAPI.chargeAction()
     }
   },
   watch: {
@@ -269,8 +225,8 @@ export default {
         case 9702005:
           this[types.SET_WINNER](msg.winner)
           this[types.END_GAME]()
-          this.hideBetAlert()
-          this.showSleepAlert()
+          // this.hideBetAlert()
+          // this.showSleepAlert()
           break
         // 单点推送中奖
         case 9702006:
@@ -293,14 +249,14 @@ export default {
           this[types.RESET_POINTS]()
           this[types.OPEN_DIALOG]({ text: this.MSG_GAME_START })
           this[types.START_GAME]()
-          this.hideSleepAlert()
+          // this.hideSleepAlert()
           // 重置胜利卡牌
           this[types.SET_WINNER](0)
           let startDialog = setTimeout(() => {
             this[types.CLOSE_DIALOG]()
             clearTimeout(startDialog)
             // 倒记时
-            this.showBetAlert()
+            // this.showBetAlert()
           }, 2000)
           break
         // 报错
@@ -344,39 +300,6 @@ export default {
   color: #2c3e50;
   overflow: hidden;
   opacity: 0.6;
-}
-
-.po-point{
-  z-index: 15;
-  margin-left: 5px;
-}
-
-.po-diamond{
-  background-image: url(./assets/diamond.png);
-  width: 15px;
-  height: 12px;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.po-diamond-num{
-  text-shadow: 1px 1px 0px rgba(0,0,0,0.5), 1px -1px 0px rgba(0,0,0,0.5), -1px 1px 0px rgba(0,0,0,0.5), -1px -1px 0px rgba(0,0,0,0.5);
-  font-size: 14px;
-  font-weight: 700;
-  color: #ffef00;
-  line-height: 20px;
-  display: inline-block;
-  vertical-align: middle;
-}
-.po-charge-btn{
-  background-color: #f8065d;
-  border: 0px;
-  color: #fff;
-  font-size: 10px;
-  border-radius: 5px;
-  width: 40px;
-  height: 22px;
-  line-height: 22px;
 }
 
 .po-poker-block{

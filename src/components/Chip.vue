@@ -18,7 +18,9 @@ export default {
   mounted () {
     // 初始化 chip 数据
     if (this.chipCoord.length < this.bets.length) {
-      this.initChip()
+      setTimeout(() => {
+        this.initChip()
+      }, 100)
     }
   },
   methods: {

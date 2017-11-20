@@ -1,24 +1,78 @@
 <template>
   <transition name="fade">
     <div class="alert" v-if="modalAlertStatus">
-      <div class="alert-text">{{ modalAlertText }}</div>
+      <div class="alert-text">{{ alertText }}</div>
       <div class="alert-mask" v-if="modalAlertMaskStatus"></div>
     </div>
   </transition>
 </template>
   
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapMutations } from 'vuex'
+import * as types from '../store/mutation-types'
 
 export default {
   name: 'modal-alert',
-  props: ['alertText', 'showMask'],
+  data () {
+    return {
+      alertText: ''
+    }
+  },
+  methods: {
+    ...mapMutations([
+      types.OPEN_MODAL_ALERT,
+      types.CLOSE_MODAL_ALERT,
+      types.OPEN_MODAL_ALERT_MASK,
+      types.CLOSE_MODAL_ALERT_MASK
+    ]),
+    /** @description 倒计时 */
+    secondCount (timeCost, callback) {
+      let resultCountTime = timeCost / 1000
+      if (callback) callback(resultCountTime)
+      let count = setInterval(() => {
+        if (resultCountTime > 0) {
+          if (callback) callback(resultCountTime - 1)
+          resultCountTime--
+        }
+        if (resultCountTime === 0) { clearInterval(count) }
+      }, 1000)
+    }
+  },
   computed: {
     ...mapState({
+      status: state => state.game.status,
+      resultLong: state => state.game.resultLong,
+      betLong: state => state.game.betLong,
       modalAlertStatus: state => state.modal.modalAlertStatus,
-      modalAlertMaskStatus: state => state.modal.modalAlertMaskStatus,
-      modalAlertText: state => state.modal.modalAlertText
+      modalAlertMaskStatus: state => state.modal.modalAlertMaskStatus
     })
+  },
+  watch: {
+    status (status) {
+      if (status) {
+        this[types.CLOSE_MODAL_ALERT_MASK]()
+        this[types.CLOSE_MODAL_ALERT]()
+        // 开启alert
+        setTimeout(() => {
+          this[types.OPEN_MODAL_ALERT]()
+        }, 1000)
+        // 触发计时
+        this.secondCount(this.betLong, (timeCount) => {
+          this.alertText = '押注时间还剩' + timeCount
+        })
+      } else {
+        this[types.OPEN_MODAL_ALERT_MASK]()
+        this[types.CLOSE_MODAL_ALERT]()
+        // 开启alert
+        setTimeout(() => {
+          this[types.OPEN_MODAL_ALERT]()
+        }, 1000)
+        // 触发计时
+        this.secondCount(this.resultLong, (timeCount) => {
+          this.alertText = '休息一会儿, 即将开始' + timeCount
+        })
+      }
+    }
   }
 }
 </script>
