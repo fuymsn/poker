@@ -225,8 +225,6 @@ export default {
         case 9702005:
           this[types.SET_WINNER](msg.winner)
           this[types.END_GAME]()
-          // this.hideBetAlert()
-          // this.showSleepAlert()
           break
         // 单点推送中奖
         case 9702006:
@@ -249,14 +247,11 @@ export default {
           this[types.RESET_POINTS]()
           this[types.OPEN_DIALOG]({ text: this.MSG_GAME_START })
           this[types.START_GAME]()
-          // this.hideSleepAlert()
           // 重置胜利卡牌
           this[types.SET_WINNER](0)
           let startDialog = setTimeout(() => {
             this[types.CLOSE_DIALOG]()
             clearTimeout(startDialog)
-            // 倒记时
-            // this.showBetAlert()
           }, 2000)
           break
         // 报错
