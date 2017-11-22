@@ -35,7 +35,7 @@
       type='move'
       ></chip>
     </div>
-    <Test></Test>
+    <!-- <Test></Test> -->
     <v-dialog width="280"></v-dialog>
     <modal-tip></modal-tip>
     <transition name="fade">

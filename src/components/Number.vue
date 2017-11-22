@@ -17,10 +17,10 @@ export default {
       getSumPointsItemById: 'getSumPointsItemById'
     }),
     selfNum () {
-      return this.getCurrentSumPointsItemById(this.numInfo.id)
+      return this.getCurrentSumPointsItemById(this.numInfo.id - 1)
     },
     serverNum () {
-      return this.getSumPointsItemById(this.numInfo.id)
+      return this.getSumPointsItemById(this.numInfo.id - 1)
     }
   }
 }

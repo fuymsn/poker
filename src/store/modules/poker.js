@@ -6,17 +6,11 @@ const state = {
   currentPoint: 0,
 
   // 用户自身投注数据
-  currentSumPoints1: 0,
-  currentSumPoints2: 0,
-  currentSumPoints3: 0,
-  currentSumPoints4: 0,
+  currentSumPointsList: [0, 0, 0, 0],
   currentSumPoints: 0,
 
   // 来自服务端总的数据
-  sumPoints1: 0,
-  sumPoints2: 0,
-  sumPoints3: 0,
-  sumPoints4: 0,
+  sumPointsList: [0, 0, 0, 0],
 
   pokerData: [
     { id: 1, name: '貂蝉' },
@@ -38,11 +32,11 @@ const state = {
 }
 
 const getters = {
-  getCurrentSumPointsItemById: (state, getters) => (id) => {
-    return state['currentSumPoints' + id]
+  getCurrentSumPointsItemById: (state, getters) => (index) => {
+    return state.currentSumPointsList[index]
   },
-  getSumPointsItemById: (state, getters) => (id) => {
-    return state['sumPoints' + id]
+  getSumPointsItemById: (state, getters) => (index) => {
+    return state.sumPointsList[index]
   },
   // [0, 0, 0, 0] //1正面, 0背面
   getWinnerBgList: (state, getters) => () => {
@@ -71,25 +65,22 @@ const mutations = {
     // state.currentChip = 0
     state.currentPoint = 0
     state.currentSumPoints = 0
-    state.currentSumPoints1 = 0
-    state.currentSumPoints2 = 0
-    state.currentSumPoints3 = 0
-    state.currentSumPoints4 = 0
+    state.currentSumPointsList = [0, 0, 0, 0]
     state.chipList = []
-    state.sumPoints1 = 0
-    state.sumPoints2 = 0
-    state.sumPoints3 = 0
-    state.sumPoints4 = 0
+    state.sumPointsList = [0, 0, 0, 0]
   },
   [types.SET_SELF_ITEM_POINTS]: (state, { id, point }) => {
-    state['currentSumPoints' + id] = point
+    // 替换值
+    state.currentSumPointsList.splice((id - 1), 1, point)
   },
   [types.SET_SUM_ITEM_POINTS]: (state, { id, point }) => {
-    state['sumPoints' + id] = point
+    // 替换值
+    state.sumPointsList.splice((id - 1), 1, point)
   },
 
   [types.SUM_POINTS]: (state) => {
-    state.currentSumPoints = state.currentSumPoints1 + state.currentSumPoints2 + state.currentSumPoints3 + state.currentSumPoints4
+    // 将数组中的值相加
+    state.currentSumPoints = state.currentSumPointsList.reduce((accumulator, currentValue) => { return accumulator + currentValue })
   },
 
   [types.SET_POKER_WIDTH]: (state, width) => {

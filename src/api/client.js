@@ -4,7 +4,8 @@ window.callMobile = function (handlerInterface, handlerMethod, parameters) {
   if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) {
     window.webkit.messageHandlers[handlerInterface].postMessage(dic)
   } else {
-    window[handlerInterface][handlerMethod](JSON.stringify(dic))
+    window[handlerInterface][handlerMethod]()
+    // window[handlerInterface][handlerMethod](JSON.stringify(dic))
     // window.Phone.chargeAction()
   }
 }
@@ -12,6 +13,6 @@ window.callMobile = function (handlerInterface, handlerMethod, parameters) {
 export default {
   chargeAction () {
     // window.Phone.chargeAction()
-    window.callMobile('Phone', 'chargeAction', '')
+    window.callMobile('Phone', 'chargeAction', null)
   }
 }
