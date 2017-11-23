@@ -217,9 +217,7 @@ export default {
           break
         // 全服广播押注 important
         case 9702004:
-          msg.beauty.map((key, index) => {
-            this[types.SET_SUM_ITEM_POINTS]({ id: index + 1, point: key })
-          })
+          this[types.SET_SUM_ITEM_POINTS](msg.beauty)
           break
         // 全服广播输赢中奖
         case 9702005:

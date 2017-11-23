@@ -73,9 +73,9 @@ const mutations = {
     // 替换值
     state.currentSumPointsList.splice((id - 1), 1, point)
   },
-  [types.SET_SUM_ITEM_POINTS]: (state, { id, point }) => {
+  [types.SET_SUM_ITEM_POINTS]: (state, sumItems) => {
     // 替换值
-    state.sumPointsList.splice((id - 1), 1, point)
+    state.sumPointsList = sumItems
   },
 
   [types.SUM_POINTS]: (state) => {
