@@ -37,11 +37,11 @@ export default {
   font-weight: 700;
   color: #ffef00;
   line-height: 20px;
-  border-bottom: 1px solid #ccc;
-  text-shadow: 1px  1px 0px rgba(0,0,0,0.5),
-    1px -1px 0px rgba(0,0,0,0.5),
-   -1px  1px 0px rgba(0,0,0,0.5),
-   -1px -1px 0px rgba(0,0,0,0.5);
+  border-bottom: 2px solid #eee;
+  text-shadow: 1px  1px 0px rgba(0,0,0,0.7),
+    1px -1px 0px rgba(0,0,0,0.7),
+   -1px  1px 0px rgba(0,0,0,0.7),
+   -1px -1px 0px rgba(0,0,0,0.7);
 }
 
 .po-num-sums{
@@ -49,9 +49,9 @@ export default {
   font-weight: 700;
   color: #333;
   line-height: 20px;
-  text-shadow: 1px  1px 0px rgba(255,255,2550,0.5),
-    1px -1px 0px rgba(255,255,255,0.5),
-   -1px  1px 0px rgba(255,255,255,0.5),
-   -1px -1px 0px rgba(255,255,255,0.5);
+  text-shadow: 1px  1px 0px rgba(255,255,2550,0.7),
+    1px -1px 0px rgba(255,255,255,0.7),
+   -1px  1px 0px rgba(255,255,255,0.7),
+   -1px -1px 0px rgba(255,255,255,0.7);
 }
-</style>
+</style> 

@@ -298,14 +298,17 @@ export default {
 .po-poker-block{
   display: flex;
   justify-content: space-around;
-  margin: 0px 2px;
+  margin: 28px 2px 0px 2px;
   perspective: 1200px;
 }
 
 .po-num-block{
   display: flex;
   justify-content: space-around;
-  margin: 25px 2px 0px 2px;
+  margin: 35px 2px 0px 2px;
+  position: absolute;
+  z-index: 10;
+  width: 100%;
 }
 
 .po-chip-block{

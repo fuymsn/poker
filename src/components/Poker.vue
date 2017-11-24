@@ -40,7 +40,7 @@ export default {
         pokerId: this.currentBetPoker,
         chipId: this.currentBetChip,
         x: parseInt(coord.x + Math.random() * (this.pokerWidth - this.chipWidth), 10),
-        y: -parseInt(coord.y + Math.random() * (this.pokerHeight - this.chipHeight - 40), 10)
+        y: -parseInt(coord.y + 40 + Math.random() * (this.pokerHeight - this.chipHeight - 60), 10)
       }
     },
     // bet 押注修改数据
