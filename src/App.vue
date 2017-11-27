@@ -35,7 +35,7 @@
       type='move'
       ></chip>
     </div>
-    <!-- <Test></Test> -->
+    <Test></Test>
     <v-dialog width="280"></v-dialog>
     <modal-tip></modal-tip>
     <transition name="fade">
@@ -74,10 +74,6 @@ export default {
     let heartBeat = setInterval(() => {
       that.pingServer()
       // 如果socket没有回应
-      // if (!that.heartBeatSendStatus) {
-      //   // 断开
-      //   that[types.STOP_HEART_BEAT]()
-      // }
       // 如果心跳停止，停止发送
       if (!that.heartBeatStatus) {
         clearInterval(heartBeat)
@@ -90,7 +86,8 @@ export default {
       MSG_GAME_ROUND_RESULT: '本局开奖结果: ',
       MSG_GAME_ROUND_PRICE: '您在本局中<br/>',
       resultCountTime: 0,
-      heartBeatSendStatus: 0 // 发送状态: 有回应1, 没有回应0
+      heartBeatSendStatus: 0, // 发送状态: 有回应1, 没有回应0
+      heartBeatCount: 0 // 允许有一次丢包的情况, 如果丢包超过1, 则断开网络
     }
   },
   components: {
@@ -110,10 +107,8 @@ export default {
       chipCoord: state => state.poker.chipCoord,
       pokerData: state => state.poker.pokerData,
       chipHeight: state => state.poker.chipHeight,
-      dialogStatus: state => state.modal.dialogStatus,
       dialogText: state => state.modal.dialogText,
-      // resultLong: state => state.game.resultLong,
-      // betLong: state => state.game.betLong,
+      dialogStatus: state => state.modal.dialogStatus,
       heartBeatStatus: state => state.game.heartBeatStatus
     }),
     ...mapGetters({
@@ -150,9 +145,12 @@ export default {
       })
       this.heartBeatSendStatus = 0
       setTimeout(() => {
-        // 判断是否有回应
-        if (!that.heartBeatSendStatus) {
+        // 判断如果两次以上没有回应, 则断开
+        if (!that.heartBeatSendStatus && that.heartBeatCount > 1) {
           that[types.STOP_HEART_BEAT]()
+        // 如果没有回应, 加1次
+        } else if (!that.heartBeatSendStatus) {
+          that.heartBeatCount ++
         }
       }, 5000)
     },

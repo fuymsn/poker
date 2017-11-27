@@ -84,6 +84,7 @@ export default {
       this.$socket.sendObj({
         cmd: 9702002,
         uid: window.userInfo.uid,
+        rid: window.userInfo.rid,
         role: this.currentPoker,
         point: this.currentChip
       })
