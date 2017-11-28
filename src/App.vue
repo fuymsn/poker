@@ -36,7 +36,7 @@
       ></chip>
     </div>
     <v-dialog width="280"></v-dialog>
-    <Test></Test>
+    <!-- <Test></Test> -->
     <!-- <modal-tip></modal-tip> -->
     <transition name="fade">
       <div class="dialog" v-if="dialogStatus">

@@ -16,8 +16,7 @@ export default {
   data () {
     return {
       alertText: '',
-      alertResultInterval: null,
-      alertBetInterval: null
+      alertInterval: null
     }
   },
   methods: {
@@ -28,26 +27,15 @@ export default {
       types.CLOSE_MODAL_ALERT_MASK
     ]),
     /** @description 倒计时 */
-    secondCountResult (callback) {
-      let resultCountTime = this.resultLong / 1000
+    secondCount (timeCost, callback) {
+      let resultCountTime = timeCost / 1000
       if (callback) callback(resultCountTime)
-      this.alertResultInterval = setInterval(() => {
+      this.alertInterval = setInterval(() => {
         if (resultCountTime > 0) {
           if (callback) callback(resultCountTime - 1)
           resultCountTime--
         }
-        if (resultCountTime === 0) { clearInterval(this.alertResultInterval) }
-      }, 1000)
-    },
-    secondCountBet (callback) {
-      let resultCountTime = this.betLong / 1000
-      if (callback) callback(resultCountTime)
-      this.alertBetInterval = setInterval(() => {
-        if (resultCountTime > 0) {
-          if (callback) callback(resultCountTime - 1)
-          resultCountTime--
-        }
-        if (resultCountTime === 0) { clearInterval(this.alertBetInterval) }
+        if (resultCountTime === 0) { clearInterval(this.alertInterval) }
       }, 1000)
     }
   },
@@ -62,6 +50,7 @@ export default {
   },
   watch: {
     status (status) {
+      clearInterval(this.alertInterval)
       if (status) {
         this[types.CLOSE_MODAL_ALERT_MASK]()
         this[types.CLOSE_MODAL_ALERT]()
@@ -70,7 +59,7 @@ export default {
           this[types.OPEN_MODAL_ALERT]()
         }, 1000)
         // 触发计时
-        this.secondCountBet((timeCount) => {
+        this.secondCount(this.betLong, (timeCount) => {
           this.alertText = '押注时间还剩' + timeCount
         })
       } else {
@@ -81,7 +70,7 @@ export default {
           this[types.OPEN_MODAL_ALERT]()
         }, 1000)
         // 触发计时
-        this.secondCountResult((timeCount) => {
+        this.secondCount(this.resultLong, (timeCount) => {
           this.alertText = '休息一会儿, 即将开始' + timeCount
         })
       }
