@@ -15,7 +15,9 @@ export default {
   name: 'modal-alert',
   data () {
     return {
-      alertText: ''
+      alertText: '',
+      alertResultInterval: null,
+      alertBetInterval: null
     }
   },
   methods: {
@@ -26,15 +28,26 @@ export default {
       types.CLOSE_MODAL_ALERT_MASK
     ]),
     /** @description 倒计时 */
-    secondCount (timeCost, callback) {
-      let resultCountTime = timeCost / 1000
+    secondCountResult (callback) {
+      let resultCountTime = this.resultLong / 1000
       if (callback) callback(resultCountTime)
-      let count = setInterval(() => {
+      this.alertResultInterval = setInterval(() => {
         if (resultCountTime > 0) {
           if (callback) callback(resultCountTime - 1)
           resultCountTime--
         }
-        if (resultCountTime === 0) { clearInterval(count) }
+        if (resultCountTime === 0) { clearInterval(this.alertResultInterval) }
+      }, 1000)
+    },
+    secondCountBet (callback) {
+      let resultCountTime = this.betLong / 1000
+      if (callback) callback(resultCountTime)
+      this.alertBetInterval = setInterval(() => {
+        if (resultCountTime > 0) {
+          if (callback) callback(resultCountTime - 1)
+          resultCountTime--
+        }
+        if (resultCountTime === 0) { clearInterval(this.alertBetInterval) }
       }, 1000)
     }
   },
@@ -57,7 +70,7 @@ export default {
           this[types.OPEN_MODAL_ALERT]()
         }, 1000)
         // 触发计时
-        this.secondCount(this.betLong, (timeCount) => {
+        this.secondCountBet((timeCount) => {
           this.alertText = '押注时间还剩' + timeCount
         })
       } else {
@@ -68,7 +81,7 @@ export default {
           this[types.OPEN_MODAL_ALERT]()
         }, 1000)
         // 触发计时
-        this.secondCount(this.resultLong, (timeCount) => {
+        this.secondCountResult((timeCount) => {
           this.alertText = '休息一会儿, 即将开始' + timeCount
         })
       }

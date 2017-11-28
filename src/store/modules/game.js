@@ -53,13 +53,14 @@ const getters = {
 }
 
 const mutations = {
-  [types.INIT_GAME]: (state, {beginTime, currentTime, bets, betLong, resultLong, point}) => {
+  [types.INIT_GAME]: (state, {status, beginTime, currentTime, bets, betLong, resultLong, point}) => {
     state.beginTime = beginTime
     state.currentTime = currentTime
     state.bets = bets
     state.betLong = betLong
     state.resultLong = resultLong
     state.point = point
+    state.status = status
   },
   [types.SET_GAME_STATUS]: (state, gameStatus) => {
     state.status = gameStatus

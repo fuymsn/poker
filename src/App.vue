@@ -35,9 +35,9 @@
       type='move'
       ></chip>
     </div>
-    <Test></Test>
     <v-dialog width="280"></v-dialog>
-    <modal-tip></modal-tip>
+    <Test></Test>
+    <!-- <modal-tip></modal-tip> -->
     <transition name="fade">
       <div class="dialog" v-if="dialogStatus">
         <div class="dialog-title"></div>
@@ -109,7 +109,8 @@ export default {
       chipHeight: state => state.poker.chipHeight,
       dialogText: state => state.modal.dialogText,
       dialogStatus: state => state.modal.dialogStatus,
-      heartBeatStatus: state => state.game.heartBeatStatus
+      heartBeatStatus: state => state.game.heartBeatStatus,
+      isConnected: state => state.websocket.isConnected
     }),
     ...mapGetters({
       chipData: 'chipData'
@@ -184,6 +185,17 @@ export default {
     },
     initGame (gameInfo) {
       this[types.INIT_GAME](gameInfo)
+    },
+    showDisconnectedDialog () {
+      this.$modal.show('dialog', {
+        title: '提示',
+        text: '网络已经断开, 请稍后再试或点击"重连"',
+        clickToClose: false,
+        buttons: [
+          { title: '重连', handler: () => { location.reload() } },
+          { title: '关闭' }
+        ]
+      })
     }
   },
   watch: {
@@ -198,7 +210,8 @@ export default {
             bets: msg.bets,
             betLong: msg.betlong,
             resultLong: msg.resultlong,
-            point: msg.point
+            point: msg.point,
+            status: msg.state
           })
           break
         // 押注
@@ -234,7 +247,7 @@ export default {
           let winDialog = setTimeout(() => {
             this[types.CLOSE_DIALOG]()
             clearTimeout(winDialog)
-          }, 3000)
+          }, 4000)
           this[types.SET_POINT](msg.point)
           break
         // 新的一局游戏开始
@@ -267,15 +280,12 @@ export default {
     // 心跳监听
     heartBeatStatus (heartBeatStatus) {
       if (!heartBeatStatus) {
-        this.$modal.show('dialog', {
-          title: '提示',
-          text: '网络已经断开, 请稍后再试或点击"重连"',
-          clickToClose: false,
-          buttons: [
-            { title: '重连', handler: () => { location.reload() } },
-            { title: '关闭' }
-          ]
-        })
+        this.showDisconnectedDialog()
+      }
+    },
+    isConnected (isConnected) {
+      if (!isConnected) {
+        this.showDisconnectedDialog()
       }
     }
   }
