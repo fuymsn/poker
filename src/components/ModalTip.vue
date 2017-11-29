@@ -31,8 +31,8 @@ export default {
     }
   },
   watch: {
-    modalTipStatus () {
-      if (this.modalTipStatus === 1) {
+    modalTipStatus (modalTipStatus) {
+      if (modalTipStatus === 1) {
         this.show()
       }
     }
@@ -42,6 +42,10 @@ export default {
 
 <style>
 /* modal rewrite */
+.v--modal-overlay{
+  background: none;
+}
+
 .v--modal-overlay[data-modal='modal-tip'] .v--modal{
   padding: 10px;
   text-align: center;

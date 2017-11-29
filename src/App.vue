@@ -35,9 +35,9 @@
       type='move'
       ></chip>
     </div>
-    <v-dialog width="280"></v-dialog>
+    <v-dialog width="280" :clickToClose="false"></v-dialog>
     <!-- <Test></Test> -->
-    <!-- <modal-tip></modal-tip> -->
+    <modal-tip></modal-tip>
     <transition name="fade">
       <div class="dialog" v-if="dialogStatus">
         <div class="dialog-title"></div>
@@ -71,12 +71,12 @@ export default {
     this.initPoker()
 
     // 启动心跳
-    let heartBeat = setInterval(() => {
+    this.heartBeatInterval = setInterval(() => {
       that.pingServer()
       // 如果socket没有回应
       // 如果心跳停止，停止发送
       if (!that.heartBeatStatus) {
-        clearInterval(heartBeat)
+        clearInterval(that.heartBeatInterval)
       }
     }, 10000)
   },
@@ -86,6 +86,7 @@ export default {
       MSG_GAME_ROUND_RESULT: '本局开奖结果: ',
       MSG_GAME_ROUND_PRICE: '您在本局中<br/>',
       resultCountTime: 0,
+      heartBeatInterval: null,
       heartBeatSendStatus: 0 // 发送状态: 有回应1, 没有回应0
     }
   },
@@ -188,7 +189,6 @@ export default {
       this.$modal.show('dialog', {
         title: '提示',
         text: '网络已经断开, 请稍后再试或点击"重连"',
-        clickToClose: false,
         buttons: [
           { title: '重连', handler: () => { location.reload() } },
           { title: '关闭' }
@@ -285,6 +285,8 @@ export default {
     isConnected (isConnected) {
       if (!isConnected) {
         this.showDisconnectedDialog()
+        // 停止心跳计算
+        clearInterval(this.heartBeatInterval)
       }
     },
     // 判断如果两次以上没有回应, 则断开
@@ -305,7 +307,7 @@ export default {
   text-align: center;
   color: #2c3e50;
   overflow: hidden;
-  opacity: 0.6;
+  /* opacity: 0.8; */
 }
 
 .po-poker-block{
