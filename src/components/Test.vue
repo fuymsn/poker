@@ -6,6 +6,7 @@
         <button @click="resetSumPoints">重制</button>
         <button @click="closeWS">关闭WS</button>
         <button @click="getGameInfo">001</button>
+        <button @click="disPing">dis心跳+1</button>
         <button @click="pingServer">心跳</button>
       </div>
     </p>
@@ -31,7 +32,8 @@ export default {
   },
   methods: {
     ...mapMutations([
-      types.RESET_POINTS
+      types.RESET_POINTS,
+      types.DISCONNECTED_COUNT
     ]),
     resetSumPoints () {
       this[types.RESET_POINTS]()
@@ -50,6 +52,9 @@ export default {
       this.$socket.sendObj({
         cmd: 9702111
       })
+    },
+    disPing () {
+      this[types.DISCONNECTED_COUNT]()
     }
   }
 }

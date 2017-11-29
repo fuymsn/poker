@@ -86,8 +86,7 @@ export default {
       MSG_GAME_ROUND_RESULT: '本局开奖结果: ',
       MSG_GAME_ROUND_PRICE: '您在本局中<br/>',
       resultCountTime: 0,
-      heartBeatSendStatus: 0, // 发送状态: 有回应1, 没有回应0
-      heartBeatCount: 0 // 允许有一次丢包的情况, 如果丢包超过1, 则断开网络
+      heartBeatSendStatus: 0 // 发送状态: 有回应1, 没有回应0
     }
   },
   components: {
@@ -110,7 +109,8 @@ export default {
       dialogText: state => state.modal.dialogText,
       dialogStatus: state => state.modal.dialogStatus,
       heartBeatStatus: state => state.game.heartBeatStatus,
-      isConnected: state => state.websocket.isConnected
+      isConnected: state => state.websocket.isConnected,
+      heartBeatCount: state => state.game.heartBeatCount
     }),
     ...mapGetters({
       chipData: 'chipData'
@@ -136,7 +136,8 @@ export default {
       types.CREATED,
       types.SET_WINNER,
       types.SET_POINT,
-      types.STOP_HEART_BEAT
+      types.STOP_HEART_BEAT,
+      types.DISCONNECTED_COUNT
     ]),
     pingServer () {
       let that = this
@@ -146,12 +147,9 @@ export default {
       })
       this.heartBeatSendStatus = 0
       setTimeout(() => {
-        // 判断如果两次以上没有回应, 则断开
-        if (!that.heartBeatSendStatus && that.heartBeatCount > 1) {
-          that[types.STOP_HEART_BEAT]()
         // 如果没有回应, 加1次
-        } else if (!that.heartBeatSendStatus) {
-          that.heartBeatCount ++
+        if (!that.heartBeatSendStatus) {
+          that[types.DISCONNECTED_COUNT]()
         }
       }, 5000)
     },
@@ -283,9 +281,16 @@ export default {
         this.showDisconnectedDialog()
       }
     },
+    // 如果断开连接, 显示断开弹窗提示
     isConnected (isConnected) {
       if (!isConnected) {
         this.showDisconnectedDialog()
+      }
+    },
+    // 判断如果两次以上没有回应, 则断开
+    heartBeatCount (heartBeatCount) {
+      if (heartBeatCount > 2) {
+        this[types.STOP_HEART_BEAT]()
       }
     }
   }
