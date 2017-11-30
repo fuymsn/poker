@@ -307,7 +307,7 @@ export default {
   text-align: center;
   color: #2c3e50;
   overflow: hidden;
-  /* opacity: 0.8; */
+  opacity: 0.7;
 }
 
 .po-poker-block{
@@ -320,7 +320,7 @@ export default {
 .po-num-block{
   display: flex;
   justify-content: space-around;
-  margin: 35px 2px 0px 2px;
+  margin: 35px 0px 0px 0px;
   position: absolute;
   z-index: 10;
   width: 100%;
