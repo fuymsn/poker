@@ -12,8 +12,9 @@ import base64 from 'base-64'
 var testInfo = {
   gameid: 9702,
   // uid: 1394510,
-  // uid: 2650007,
-  uid: 2680844,
+  uid: 2650007,
+  // uid: 2680845,
+  // uid: 1234,
   rid: 2650010,
   ws: 'ws://10.1.100.104:9083',
   token: '43606811c7305ccc6abb2be116579bfd'
@@ -28,7 +29,9 @@ window.userInfo = userInfo
 // eyJnYW1laWQiOjk3MDIsInVpZCI6MTM5NDUxMCwicmlkIjoyNjUwMDEwLCJ3cyI6IndzOi8vMTAuNzIuNS4yNDo5MDgzIiwidG9rZW4iOiI0MzYwNjgxMWM3MzA1Y2NjNmFiYjJiZTExNjU3OWJmZCJ9
 
 Vue.use(Vuex)
-Vue.use(VueNativeSock, userInfo.ws + '/websocket?request=' + userInfoEncode, { store: store, format: 'json' })
+if (userInfo.ws) {
+  Vue.use(VueNativeSock, userInfo.ws + '/websocket?request=' + userInfoEncode, { store: store, format: 'json' })
+}
 Vue.use(VModal, { dialog: true })
 
 Vue.config.productionTip = false

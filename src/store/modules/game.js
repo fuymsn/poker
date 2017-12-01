@@ -31,9 +31,7 @@ const state = {
   bets: [],
   betLong: 0,
   resultLong: 0,
-  point: 0,
-  heartBeatStatus: 1, // 1 心跳连通, 2 心跳断开
-  heartBeatCount: 0 // 允许有一次丢包的情况, 如果丢包超过1, 则断开网络
+  point: 0
 }
 
 const getters = {
@@ -77,15 +75,6 @@ const mutations = {
   },
   [types.SET_POINT]: (state, point) => {
     state.point = point
-  },
-  [types.START_HEART_BEAT]: (state) => {
-    state.heartBeatStatus = 1
-  },
-  [types.STOP_HEART_BEAT]: (state) => {
-    state.heartBeatStatus = 0
-  },
-  [types.DISCONNECTED_COUNT]: (state) => {
-    state.heartBeatCount ++
   }
 }
 

@@ -8,6 +8,7 @@
         <button @click="getGameInfo">001</button>
         <button @click="disPing">dis心跳+1</button>
         <button @click="pingServer">心跳</button>
+        <button @click="sendError">WS error</button>
       </div>
     </p>
     <p>Message from server: "{{ message }}"</p>
@@ -33,7 +34,7 @@ export default {
   methods: {
     ...mapMutations([
       types.RESET_POINTS,
-      types.DISCONNECTED_COUNT
+      types.HEART_BEAT_DISCONNECTED_COUNT
     ]),
     resetSumPoints () {
       this[types.RESET_POINTS]()
@@ -54,7 +55,12 @@ export default {
       })
     },
     disPing () {
-      this[types.DISCONNECTED_COUNT]()
+      this[types.HEART_BEAT_DISCONNECTED_COUNT]()
+    },
+    sendError () {
+      this.$socket.sendObj({
+        cmd: 9702666
+      })
     }
   }
 }

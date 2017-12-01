@@ -36,7 +36,7 @@
       ></chip>
     </div>
     <v-dialog width="280" :clickToClose="false"></v-dialog>
-    <!-- <Test></Test> -->
+    <Test></Test>
     <modal-tip></modal-tip>
     <transition name="fade">
       <div class="dialog" v-if="dialogStatus">
@@ -109,9 +109,12 @@ export default {
       chipHeight: state => state.poker.chipHeight,
       dialogText: state => state.modal.dialogText,
       dialogStatus: state => state.modal.dialogStatus,
-      heartBeatStatus: state => state.game.heartBeatStatus,
+      heartBeatStatus: state => state.websocket.heartBeatStatus,
+      heartBeatCount: state => state.websocket.heartBeatCount,
       isConnected: state => state.websocket.isConnected,
-      heartBeatCount: state => state.game.heartBeatCount
+      closeCode: state => state.websocket.closeCode,
+      closeReason: state => state.websocket.closeReason,
+      errorReason: state => state.websocket.errorReason
     }),
     ...mapGetters({
       chipData: 'chipData'
@@ -138,7 +141,7 @@ export default {
       types.SET_WINNER,
       types.SET_POINT,
       types.STOP_HEART_BEAT,
-      types.DISCONNECTED_COUNT
+      types.HEART_BEAT_DISCONNECTED_COUNT
     ]),
     pingServer () {
       let that = this
@@ -150,7 +153,7 @@ export default {
       setTimeout(() => {
         // 如果没有回应, 加1次
         if (!that.heartBeatSendStatus) {
-          that[types.DISCONNECTED_COUNT]()
+          that[types.HEART_BEAT_DISCONNECTED_COUNT]()
         }
       }, 5000)
     },
@@ -185,10 +188,12 @@ export default {
     initGame (gameInfo) {
       this[types.INIT_GAME](gameInfo)
     },
-    showDisconnectedDialog () {
+    showDisconnectedDialog ({ closeCode, closeReason, category }) {
+      closeCode = closeCode ? closeCode + '<br/>' : ''
+      closeReason = closeReason ? closeReason + '<br/>' : ''
       this.$modal.show('dialog', {
         title: '提示',
-        text: '网络已经断开, 请稍后再试或点击"重连"',
+        text: closeCode + closeReason + category + '已经断开, 请稍后再试或点击"重连"',
         buttons: [
           { title: '重连', handler: () => { location.reload() } },
           { title: '关闭' }
@@ -278,20 +283,31 @@ export default {
     // 心跳监听
     heartBeatStatus (heartBeatStatus) {
       if (!heartBeatStatus) {
-        this.showDisconnectedDialog()
+        // 断开网络
+        this.$socket.close()
+        this.showDisconnectedDialog({
+          closeCode: this.closeCode,
+          closeReason: this.closeReason,
+          category: '心跳'
+        })
       }
     },
     // 如果断开连接, 显示断开弹窗提示
     isConnected (isConnected) {
-      if (!isConnected) {
-        this.showDisconnectedDialog()
-        // 停止心跳计算
+      if (!isConnected && this.heartBeatStatus) {
+        this.showDisconnectedDialog({
+          closeCode: this.closeCode,
+          closeReason: this.closeReason,
+          category: '网络'
+        })
+        // 如果网络断开, 停止心跳
         clearInterval(this.heartBeatInterval)
       }
     },
     // 判断如果两次以上没有回应, 则断开
     heartBeatCount (heartBeatCount) {
       if (heartBeatCount > 2) {
+        // 停止心跳
         this[types.STOP_HEART_BEAT]()
       }
     }
