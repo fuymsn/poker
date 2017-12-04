@@ -20,9 +20,6 @@ let callWebview = (handlerMethod, parameters) => {
   this[handlerMethod](parameters)
 }
 
-// call webview
-window.callWebview = null
-
 export default {
   chargeAction () {
     // window.Phone.chargeAction()
