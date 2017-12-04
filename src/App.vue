@@ -36,7 +36,7 @@
       ></chip>
     </div>
     <v-dialog width="280" :clickToClose="false"></v-dialog>
-    <Test></Test>
+    <!-- <Test></Test> -->
     <modal-tip></modal-tip>
     <transition name="fade">
       <div class="dialog" v-if="dialogStatus">
@@ -60,6 +60,7 @@ import Number from './components/Number'
 import ModalTip from './components/ModalTip'
 import ModalAlert from './components/ModalAlert'
 import ConnectStatus from './components/ConnectStatus'
+import ClientAPI from './api/client'
 import * as types from './store/mutation-types'
 
 export default {
@@ -79,6 +80,14 @@ export default {
         clearInterval(that.heartBeatInterval)
       }
     }, 10000)
+    // 初始化添加方法监听(universal)
+    ClientAPI.addCallWebviewListener.call(this)
+
+    // 给android 单独写的一个接口
+    // 以后优化删除
+    window.updatePoint = () => {
+      that.updatePoint()
+    }
   },
   data () {
     return {
@@ -193,11 +202,18 @@ export default {
       closeReason = closeReason ? closeReason + '<br/>' : ''
       this.$modal.show('dialog', {
         title: '提示',
-        text: closeCode + closeReason + category + '已经断开, 请稍后再试或点击"重连"',
+        text: closeCode + category + '已经断开, 请稍后再试或点击"重连"',
+        // text: closeCode + closeReason + category + '已经断开, 请稍后再试或点击"重连"',
         buttons: [
           { title: '重连', handler: () => { location.reload() } },
           { title: '关闭' }
         ]
+      })
+    },
+    updatePoint () {
+      this.$socket.sendObj({
+        cmd: 9702008,
+        uid: window.userInfo.uid
       })
     }
   },
@@ -265,6 +281,10 @@ export default {
             this[types.CLOSE_DIALOG]()
             clearTimeout(startDialog)
           }, 2000)
+          break
+        // 重置金额
+        case 9702008:
+          this[types.SET_POINT](msg.point)
           break
         // 报错
         case 9702099:

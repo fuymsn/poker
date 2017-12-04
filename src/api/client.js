@@ -1,3 +1,4 @@
+// call native code function
 window.callMobile = function (handlerInterface, handlerMethod, parameters) {
   // handlerInterface由iOS addScriptMessageHandler与andorid addJavascriptInterface 代码注入而来。
   var dic = { 'handlerInterface': handlerInterface, 'function': handlerMethod, 'parameters': parameters }
@@ -10,9 +11,24 @@ window.callMobile = function (handlerInterface, handlerMethod, parameters) {
   }
 }
 
+// native code call webview javascript
+let callWebview = (handlerMethod, parameters) => {
+  if (!this[handlerMethod]) {
+    console.error('PO error: function "' + handlerMethod + '" is not defined')
+    return
+  }
+  this[handlerMethod](parameters)
+}
+
+// call webview
+window.callWebview = null
+
 export default {
   chargeAction () {
     // window.Phone.chargeAction()
     window.callMobile('Phone', 'chargeAction', null)
+  },
+  addCallWebviewListener () {
+    window.callWebview = callWebview
   }
 }
